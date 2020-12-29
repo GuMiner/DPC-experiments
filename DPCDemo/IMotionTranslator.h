@@ -6,4 +6,5 @@ class IMotionTranslator
 {
 public:
     virtual bool Update(Camera* camera, float frameTime) = 0;
+    virtual ~IMotionTranslator() = 0;
 };

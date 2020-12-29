@@ -37,6 +37,8 @@ bool Renderer::Init() {
         return false;
     }
 
+    updateOrder = { &guiRenderer, &viewer, &fpsCounter };
+    renderOrder = { &viewer, &fpsCounter, &guiRenderer };
     return true;
 }
 
@@ -50,12 +52,14 @@ void Renderer::Teardown() {
 
 void Renderer::update(float currentTime, float frameTime)
 {
-    guiRenderer.Update(currentTime, frameTime); // Must be before any IMGUI commands are passed in.
+    const Camera& camera = viewer.GetCamera();
 
-    viewer.Update(frameTime);
+    for (const auto& item : updateOrder)
+    {
+        item->Update(currentTime, frameTime, camera);
+    }
+
     // world.Update(viewer.GetCamera().position, currentTime, frameTime);
-
-    fpsCounter.UpdateFps(frameTime);
 }
 
 void Renderer::render(float currentTime, glm::mat4& viewMatrix)
@@ -69,19 +73,17 @@ void Renderer::render(float currentTime, glm::mat4& viewMatrix)
     glClearBufferfv(GL_DEPTH, 0, &depth);
 
     // world.Render(projectionMatrix);
-    fpsCounter.Render();
-    viewer.Render();
 
-    // Must always be last in case other rendering steps add GUI elements.
-    guiRenderer.Render();
+    for (const auto& item : renderOrder)
+    {
+        item->Render(currentTime, projectionMatrix);
+    }
 }
 
 void Renderer::Run()
 {
     float gameTime = 0;
     float lastFrameTime = 0.06f;
-
-    bool focusPaused = false;
 
     while (!glfwWindowShouldClose(opengl.GetWindow()))
     {

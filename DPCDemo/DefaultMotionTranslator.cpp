@@ -1,6 +1,9 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include "DefaultMotionTranslator.h"
 
+IMotionTranslator::~IMotionTranslator() {
+}
+
 DefaultMotionTranslator::DefaultMotionTranslator()
     : wasMouseDown(false)
 {

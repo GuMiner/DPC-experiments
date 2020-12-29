@@ -16,9 +16,9 @@ Viewer::~Viewer()
     delete motionTranslator;
 }
 
-void Viewer::Update(float frameTime)
+void Viewer::Update(float currentTime, float lastFrameTime, const Camera& camera)
 {
-    if (motionTranslator->Update(&camera, frameTime))
+    if (motionTranslator->Update(&this->camera, lastFrameTime))
     {
         UpdateMatrices();
     }
@@ -51,7 +51,7 @@ void Viewer::UpdateMatrices()
     perspectiveMatrix = glm::perspectiveLH(glm::radians(fovY), aspectRatio, nearPlane, farPlane);
 }
 
-void Viewer::Render()
+void Viewer::Render(float currentTime, const glm::mat4& projectionMatrix)
 {
     ImGui::Begin("Camera");
     ImGui::InputFloat3("Position", &camera.position[0], 2);

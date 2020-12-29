@@ -1,8 +1,10 @@
 #pragma once
 #include <GLFW\glfw3.h>
+#include "Camera.h"
 #include "ShaderFactory.h"
 #include "IGlfwKeyHandler.h"
 #include "IGlfwMouseHandler.h"
+#include "IRenderable.h"
 
 struct ImguiRendererProgram
 {
@@ -17,7 +19,7 @@ struct ImguiRendererProgram
 };
 
 // Renders IMGUI-type GUI. Modified from imgui_impl_glfw_gl3.h/cpp
-class ImguiRenderer : public IGlfwKeyHandler, public IGlfwMouseHandler
+class ImguiRenderer : public IGlfwKeyHandler, public IGlfwMouseHandler, public IRenderable
 {
     static GLFWwindow* window;
 
@@ -35,6 +37,7 @@ class ImguiRenderer : public IGlfwKeyHandler, public IGlfwMouseHandler
     float mouseWheelPos;
     bool isMousePress[3];
 
+
     void SetStyle();
 
 public:
@@ -43,8 +46,9 @@ public:
     bool LoadImGui(GLFWwindow* window, ShaderFactory* shaderFactory);
     void UnloadImGui();
 
-    void Update(float gameTime, float frameTime);
-    void Render();
+
+    void Update(float currentTime, float lastFrameTime, const Camera& camera) override;
+    void Render(float currentTime, const glm::mat4& projectionMatrix) override;
 
     // Inherited via IGlfwKeyHandler
     virtual void GlfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) override;

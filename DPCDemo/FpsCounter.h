@@ -1,5 +1,7 @@
 #pragma once
-class FpsCounter
+#include "IRenderable.h"
+
+class FpsCounter : public IRenderable
 {
     float fpsTimeAggregated;
     int fpsFramesCounted;
@@ -7,7 +9,7 @@ class FpsCounter
 
 public:
     FpsCounter();
-    void UpdateFps(float frameTime);
-    void Render();
+    void Update(float currentTime, float lastFrameTime, const Camera& camera) override;
+    void Render(float currentTime, const glm::mat4& projectionMatrix) override;
 };
 

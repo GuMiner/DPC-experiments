@@ -7,6 +7,7 @@
 #include <glm\mat4x4.hpp>
 #include "FpsCounter.h"
 #include "ImguiRenderer.h"
+#include "IRenderable.h"
 #include "OpenGl.h"
 #include "ShaderFactory.h"
 #include "Viewer.h"
@@ -18,6 +19,9 @@ class Renderer
 	OpenGl opengl;
 	ShaderFactory shaderFactory;
 	Viewer viewer;
+
+	std::vector<IRenderable*> updateOrder;
+	std::vector<IRenderable*> renderOrder;
 
 	void update(float currentTime, float frameTime);
 	void render(float currentTime, glm::mat4& viewMatrix);

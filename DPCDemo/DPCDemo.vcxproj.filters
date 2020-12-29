@@ -31,6 +31,12 @@
     <Filter Include="Header Files\Display\OpenGL">
       <UniqueIdentifier>{813b9455-850f-4b57-8a28-b0ad4493e1c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Display\Infra">
+      <UniqueIdentifier>{682e8c13-1b67-4a00-95cc-dd3d384173cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Display\Infra">
+      <UniqueIdentifier>{fece95a1-3730-4057-912d-f9a36f5e3772}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DPCDemo.cpp">
@@ -38,9 +44,6 @@
     </ClCompile>
     <ClCompile Include="DeviceQuerier.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Viewer.cpp">
-      <Filter>Source Files\Display</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>Source Files\Input</Filter>
@@ -54,31 +57,34 @@
     <ClCompile Include="OpenGlCapabilities.cpp">
       <Filter>Source Files\Display\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="FpsCounter.cpp">
-      <Filter>Source Files\Display</Filter>
-    </ClCompile>
-    <ClCompile Include="ImguiRenderer.cpp">
-      <Filter>Source Files\Display</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DefaultMotionTranslator.cpp">
       <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="FpsCounter.cpp">
+      <Filter>Source Files\Display\Infra</Filter>
+    </ClCompile>
+    <ClCompile Include="ImguiRenderer.cpp">
+      <Filter>Source Files\Display\Infra</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewer.cpp">
+      <Filter>Source Files\Display\Infra</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderFactory.cpp">
+      <Filter>Source Files\Display\Infra</Filter>
+    </ClCompile>
+    <ClCompile Include="Random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeviceQuerier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Viewer.h">
-      <Filter>Header Files\Display</Filter>
-    </ClInclude>
     <ClInclude Include="IMotionTranslator.h">
       <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files\Display</Filter>
     </ClInclude>
     <ClInclude Include="IGlfwKeyHandler.h">
       <Filter>Header Files\Input</Filter>
@@ -98,17 +104,32 @@
     <ClInclude Include="OpenGlCapabilities.h">
       <Filter>Header Files\Display\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="FpsCounter.h">
-      <Filter>Header Files\Display</Filter>
-    </ClInclude>
-    <ClInclude Include="ImguiRenderer.h">
-      <Filter>Header Files\Display</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DefaultMotionTranslator.h">
       <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderFactory.h">
+      <Filter>Header Files\Display\Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="FpsCounter.h">
+      <Filter>Header Files\Display\Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Display\Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="ImguiRenderer.h">
+      <Filter>Header Files\Display\Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="Viewer.h">
+      <Filter>Header Files\Display\Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderable.h">
+      <Filter>Header Files\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

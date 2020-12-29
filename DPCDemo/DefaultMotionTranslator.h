@@ -40,5 +40,6 @@ class DefaultMotionTranslator : public IMotionTranslator
 public:
     DefaultMotionTranslator();
     bool Update(Camera* camera, float frameTime);
+        
 };
 

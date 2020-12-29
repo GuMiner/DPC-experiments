@@ -6,10 +6,10 @@ FpsCounter::FpsCounter() :
 {
 }
 
-void FpsCounter::UpdateFps(float frameTime)
+void FpsCounter::Update(float currentTime, float lastFrameTime, const Camera& camera)
 {
     ++fpsFramesCounted;
-    fpsTimeAggregated += frameTime;
+    fpsTimeAggregated += lastFrameTime;
     if (fpsTimeAggregated > 0.50f)
     {
         lastFrameRate = (float)fpsFramesCounted / (float)fpsTimeAggregated;
@@ -18,7 +18,7 @@ void FpsCounter::UpdateFps(float frameTime)
     }
 }
 
-void FpsCounter::Render()
+void FpsCounter::Render(float currentTime, const glm::mat4& projectionMatrix)
 {
     ImGui::Begin("FPS", nullptr);
     ImGui::SetWindowSize(ImVec2(100, 100));

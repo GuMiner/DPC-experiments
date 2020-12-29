@@ -123,7 +123,7 @@ void ImguiRenderer::UnloadImGui()
     ImGui::GetIO().Fonts->TexID = 0;
 }
 
-void ImguiRenderer::Update(float currentTime, float frameTime)
+void ImguiRenderer::Update(float currentTime, float frameTime, const Camera& _unused)
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -166,7 +166,7 @@ void ImguiRenderer::Update(float currentTime, float frameTime)
     ImGui::NewFrame();
 }
 
-void ImguiRenderer::Render()
+void ImguiRenderer::Render(float _unused, const glm::mat4& _unused2)
 {
     ImGui::Render(); // 'Finalize' for render -- the actual rendering is performed from here on down.
     ImDrawData* drawData = ImGui::GetDrawData();

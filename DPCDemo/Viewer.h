@@ -4,9 +4,10 @@
 #include <glm\mat4x4.hpp>
 #include "Camera.h"
 #include "IMotionTranslator.h"
+#include "IRenderable.h"
 
 // Takes in user input and a camera to output a perspective and view matrix.
-class Viewer
+class Viewer : public IRenderable
 {
     float fovY;
 
@@ -31,8 +32,8 @@ public:
     ~Viewer();
 
     // Updates the view position from user input.
-    void Update(float frameTime);
-    void Render();
+    void Update(float currentTime, float lastFrameTime, const Camera& camera) override;
+    void Render(float currentTime, const glm::mat4& projectionMatrix) override;
     void SetScreenSize(int width, int height);
 
     Camera GetCamera() const;

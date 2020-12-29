@@ -3,32 +3,27 @@
 #define FPGA 0
 #define FPGA_EMULATOR 0
 
-#include <map>
+#include <array>
+#include <iomanip>
 #include <iostream>
+#include <map>
+#include <thread>
 #include <vector>
 #include <CL/sycl.hpp>
-#if defined(FPGA) || defined(FPGA_EMULATOR)
+#if FPGA || FPGA_EMULATOR
 #include <CL/sycl/INTEL/fpga_extensions.hpp>
 #endif
-#include <array>
-#include <iostream>
 
-#if defined(ENABLE_GUI)
+#if ENABLE_GUI
 #include "Renderer.h"
 Renderer* renderer;
 #endif
 
 #include "DeviceQuerier.h"
+#include "Particle.h"
+#include "Random.h"
 
 using namespace cl::sycl;
-
-// Convience data access definitions
-constexpr access::mode dp_read = access::mode::read;
-constexpr access::mode dp_write = access::mode::write;
-
-// ARRAY type & data size for use in this example
-constexpr size_t array_size = 10000;
-typedef std::array<int, array_size> IntArray;
 
 // output message for runtime exceptions
 #define EXCEPTION_MSG \
@@ -37,23 +32,16 @@ typedef std::array<int, array_size> IntArray;
     If you are targeting the FPGA emulator, compile with -DFPGA_EMULATOR.\n"
 
 //************************************
-// Function description: initialize the array from 0 to array_size-1
-//************************************
-void initialize_array(IntArray &a) {
-  for (size_t i = 0; i < a.size(); i++) a[i] = i;
-}
-
-//************************************
 // Function description: create a device queue with the default selector or
 // explicit FPGA selector when FPGA macro is defined
 //    return: DPC++ queue object
 //************************************
 queue create_device_queue() {
   // create device selector for the device of your interest
-#ifdef FPGA_EMULATOR
+#if FPGA_EMULATOR
   // DPC++ extension: FPGA emulator selector on systems without FPGA card
   INTEL::fpga_emulator_selector dselector;
-#elif defined(FPGA)
+#elif FPGA
   // DPC++ extension: FPGA selector on systems with FPGA card
   INTEL::fpga_selector dselector;
 #else
@@ -92,106 +80,150 @@ queue create_device_queue() {
   }
 }
 
+void SimulateParticles() {
+    long particleCount = 16000;
+    long reportInterval = 2;
+    long simSteps = 500;
+    float dt = 0.1f;
 
-//************************************
-// Compute vector addition in DPC++ on device: sum of the data is returned in
-// 3rd parameter "sum_parallel"
-//************************************
-void VectorAddInDPCPP(const IntArray &addend_1, const IntArray &addend_2,
-                      IntArray &sum_parallel) {
-    
+    std::vector<Particle> particles;
+
+    Random randomGenerator = Random();
+    for (long i = 0; i < particleCount; i++)
+    {
+        particles.push_back(Particle(randomGenerator));
+    }
+
     queue q = create_device_queue();
     DeviceQuerier::OutputDeviceInfo(q.get_device());
-  
-  // print out the device information used for the kernel code
-  std::cout << "Device: " << q.get_device().get_info<info::device::name>()
-            << std::endl;
 
-  // create the range object for the arrays managed by the buffer
-  range<1> num_items{array_size};
+    range<1> particleRange(particleCount);
+    buffer<Particle, 1> particleBuffer(particles.data(), particleCount,
+        { cl::sycl::property::buffer::use_host_ptr() });
+    float* energy = malloc_shared<float>(1, q);
 
-  // create buffers that hold the data shared between the host and the devices.
-  //    1st parameter: pointer of the data;
-  //    2nd parameter: size of the data
-  // the buffer destructor is responsible to copy the data back to host when it
-  // goes out of scope.
-  buffer<int, 1> addend_1_buf(addend_1.data(), num_items);
-  buffer<int, 1> addend_2_buf(addend_2.data(), num_items);
-  buffer<int, 1> sum_buf(sum_parallel.data(), num_items);
+    // Pulled from NBody demo
+    constexpr float kSofteningSquared = 1e-3;
+    constexpr float kG = 6.67259e-11;
 
-  // submit a command group to the queue by a lambda function that
-  // contains the data access permission and device computation (kernel)
-  q.submit([&](handler &h) {
-    // create an accessor for each buffer with access permission: read, write or
-    // read/write the accessor is the only mean to access the memory in the
-    // buffer.
-    auto addend_1_accessor = addend_1_buf.get_access<dp_read>(h);
-    auto addend_2_accessor = addend_2_buf.get_access<dp_read>(h);
+    for (int s = 1; s <= simSteps; ++s) {
+        auto simStart = std::chrono::steady_clock::now();
+        float kenergy = 0;
+        try {
+            // Simulate
+            q.submit([&](handler& handler) {
+                auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
+                handler.parallel_for(particleRange, [=](nd_item<1> it) {
+                    auto i = it.get_global_id();
+                    float acc0 = p[i].acceleration[0];
+                    float acc1 = p[i].acceleration[1];
+                    float acc2 = p[i].acceleration[2];
+                    for (int j = 0; j < particleCount; j++) {
+                        float dx, dy, dz;
+                        float distance_sqr = 0.0;
+                        float distance_inv = 0.0;
 
-    // the sum_accessor is used to store (with write permision) the sum data
-    auto sum_accessor = sum_buf.get_access<dp_write>(h);
+                        dx = p[j].position[0] - p[i].position[0];  // 1flop
+                        dy = p[j].position[1] - p[i].position[1];  // 1flop
+                        dz = p[j].position[2] - p[i].position[2];  // 1flop
 
-    // Use parallel_for to run array addition in parallel on device. This
-    // executes the kernel.
-    //    1st parameter is the number of work items to use
-    //    2nd parameter is the kernel, a lambda that specifies what to do per
-    //    work item. the parameter of the lambda is the work item id of the
-    //    current item.
-    // DPC++ supports unnamed lambda kernel by default.
-    h.parallel_for(num_items, [=](id<1> i) {
-      sum_accessor[i] = addend_1_accessor[i] + addend_2_accessor[i];
-    });
-  });
+                        distance_sqr =
+                            dx * dx + dy * dy + dz * dz + kSofteningSquared;  // 6flops
+                        distance_inv = 1.0f / sycl::sqrt(distance_sqr);       // 1div+1sqrt
 
-  // q.submit() is an asynchronously call. DPC++ runtime enqueues and runs the
-  // kernel asynchronously. at the end of the DPC++ scope the buffer's data is
-  // copied back to the host.
+                        acc0 += dx * kG * p[j].mass * distance_inv * distance_inv *
+                            distance_inv;  // 6flops
+                        acc1 += dy * kG * p[j].mass * distance_inv * distance_inv *
+                            distance_inv;  // 6flops
+                        acc2 += dz * kG * p[j].mass * distance_inv * distance_inv *
+                            distance_inv;  // 6flops
+                    }
+                    p[i].acceleration[0] = acc0;
+                    p[i].acceleration[1] = acc1;
+                    p[i].acceleration[2] = acc2;
+                    });
+                }).wait_and_throw();
+
+            // This bit seems to not work well in debug mode.
+            // Compute Kinetic Energy
+            // Second kernel updates the velocity and position for all particles
+            q.submit([&](handler& handler) {
+                auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
+                handler.parallel_for(nd_range<1>{ particleRange, 1 },
+                    ONEAPI::reduction(energy, 0.0f, std::plus<float>()), [=](nd_item<1> it, auto& energy) {
+
+                        auto i = it.get_global_id();
+                        p[i].velocity[0] += p[i].acceleration[0] * dt;  // 2flops
+                        p[i].velocity[1] += p[i].acceleration[1] * dt;  // 2flops
+                        p[i].velocity[2] += p[i].acceleration[2] * dt;  // 2flops
+
+                        p[i].position[0] += p[i].velocity[0] * dt;  // 2flops
+                        p[i].position[1] += p[i].velocity[1] * dt;  // 2flops
+                        p[i].position[2] += p[i].velocity[2] * dt;  // 2flops
+
+                        p[i].acceleration[0] = 0.f;
+                        p[i].acceleration[1] = 0.f;
+                        p[i].acceleration[2] = 0.f;
+
+                        energy += (p[i].mass *
+                            (p[i].velocity[0] * p[i].velocity[0] + p[i].velocity[1] * p[i].velocity[1] +
+                                p[i].velocity[2] * p[i].velocity[2]));  // 7flops
+                    });
+                }).wait_and_throw();
+
+            kenergy = 0.5 * (*energy);
+            *energy = 0.f;
+        }
+        catch (sycl::exception const& e) {
+            std::cout << "SYCL DPC++ Exception:" << std::endl
+                << e.what() << std::endl;
+        }
+
+        // Log simulation status
+        float elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(
+            std::chrono::steady_clock::now() - simStart).count();
+        if ((s % reportInterval) == 0) { // Output status every 2 steps
+            float gflops = 1e-9 * ((11. + 18.) * particleCount * particleCount + particleCount * 19.);
+            std::cout << " " << std::left << std::setw(8) << s << std::left
+                << std::setprecision(5) << std::setw(8) << s * dt
+                << std::left << std::setprecision(5) << std::setw(12)
+                << kenergy << std::left << std::setprecision(5)
+                << std::setw(12) << elapsed_seconds << std::left
+                << std::setprecision(5) << std::setw(12)
+                << gflops * reportInterval / elapsed_seconds << std::endl;
+        }
+    }
+
+    std::cout << "Done with simulation!" << std::endl;
 }
 
-//************************************
-// Demonstrate summation of arrays both in scalar on CPU and parallel on device
-//************************************
+void RenderThread() {
+    renderer = new Renderer();
+    if (!renderer->Init())
+    {
+        std::cout << "Failed to initialize the GUI" << std::endl;
+        delete renderer;
+
+        return;
+    }
+
+    renderer->Run();
+
+    renderer->Teardown();
+    delete renderer;
+}
+
 int main() {
-  // create int array objects with "array_size" to store the input and output
-  // data
-  IntArray addend_1, addend_2, sum_scalar, sum_parallel;
 
 #if defined(ENABLE_GUI)
-  renderer = new Renderer();
-  if (!renderer->Init())
-  {
-      std::cout << "Failed to initialize the GUI" << std::endl;
-      delete renderer;
-
-      return 1;
-  }
-
-  renderer->Run();
+  std::thread rendererThread (&RenderThread);
 #endif
 
-  // Initialize input arrays with values from 0 to array_size-1
-  initialize_array(addend_1);
-  initialize_array(addend_2);
+  SimulateParticles();
 
-  // Compute vector addition in DPC++
-  VectorAddInDPCPP(addend_1, addend_2, sum_parallel);
-
-  // Computes the sum of two arrays in scalar for validation
-  for (size_t i = 0; i < sum_scalar.size(); i++)
-    sum_scalar[i] = addend_1[i] + addend_2[i];
-
-  // Verify that the two sum arrays are equal
-  for (size_t i = 0; i < sum_parallel.size(); i++) {
-    if (sum_parallel[i] != sum_scalar[i]) {
-      std::cout << "fail" << std::endl;
-      return -1;
-    }
-  }
-  std::cout << "success" << std::endl;
 
 #if defined(ENABLE_GUI)
-  renderer->Teardown();
-  delete renderer;
+  rendererThread.join();
 #endif
 
   return 0;
