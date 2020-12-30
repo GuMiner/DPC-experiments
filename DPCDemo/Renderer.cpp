@@ -5,7 +5,7 @@
 #include "Renderer.h"
 
 Renderer::Renderer() : 
-    fpsCounter(), guiRenderer(), opengl("DPC++ Demo"), shaderFactory() {
+    guiRenderer(), opengl("DPC++ Demo"), shaderFactory(), axis() {
 
 }
 
@@ -37,8 +37,14 @@ bool Renderer::Init() {
         return false;
     }
 
-    updateOrder = { &guiRenderer, &viewer, &fpsCounter };
-    renderOrder = { &viewer, &fpsCounter, &guiRenderer };
+    if (!axis.Init(shaderFactory))
+    {
+        std::cout << "Unable to load Axis!" << std::endl;
+        return false;
+    }
+
+    updateOrder = { &guiRenderer, &viewer, &axis, &fpsCounter };
+    renderOrder = { &viewer, &axis, &fpsCounter, &guiRenderer };
     return true;
 }
 

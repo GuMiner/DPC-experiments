@@ -37,6 +37,9 @@
     <Filter Include="Header Files\Display\Infra">
       <UniqueIdentifier>{fece95a1-3730-4057-912d-f9a36f5e3772}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Display\OpenGL\Vbo">
+      <UniqueIdentifier>{45250c82-d69e-4944-b580-c543114ae4ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DPCDemo.cpp">
@@ -77,6 +80,9 @@
     </ClCompile>
     <ClCompile Include="Particle.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Axis.cpp">
+      <Filter>Source Files\Display</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +136,18 @@
     </ClInclude>
     <ClInclude Include="Random.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VboBase.hpp">
+      <Filter>Header Files\Display\OpenGL\Vbo</Filter>
+    </ClInclude>
+    <ClInclude Include="PositionVbo.hpp">
+      <Filter>Header Files\Display\OpenGL\Vbo</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorVbo.hpp">
+      <Filter>Header Files\Display\OpenGL\Vbo</Filter>
+    </ClInclude>
+    <ClInclude Include="Axis.h">
+      <Filter>Header Files\Display</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

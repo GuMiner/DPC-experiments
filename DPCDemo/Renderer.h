@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #pragma clang diagnostic pop
 #include <glm\mat4x4.hpp>
+#include "Axis.h"
 #include "FpsCounter.h"
 #include "ImguiRenderer.h"
 #include "IRenderable.h"
@@ -14,6 +15,7 @@
 
 class Renderer
 {
+	Axis axis;
 	FpsCounter fpsCounter;
 	ImguiRenderer guiRenderer;
 	OpenGl opengl;
