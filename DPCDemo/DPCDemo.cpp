@@ -80,11 +80,16 @@ queue create_device_queue() {
   }
 }
 
+std::vector<glm::vec3> particlePositions;
+std::atomic<bool> shouldReadUpdate(false);
+std::atomic<bool> hasReadUpdate(true);
+
+std::atomic<bool> shouldStopSimulating(false);
+
 void SimulateParticles() {
     long particleCount = 16000;
     long reportInterval = 2;
-    long simSteps = 500;
-    float dt = 0.1f;
+    float dt = 0.001f;
 
     std::vector<Particle> particles;
 
@@ -98,107 +103,128 @@ void SimulateParticles() {
     DeviceQuerier::OutputDeviceInfo(q.get_device());
 
     range<1> particleRange(particleCount);
-    buffer<Particle, 1> particleBuffer(particles.data(), particleCount,
-        { cl::sycl::property::buffer::use_host_ptr() });
     float* energy = malloc_shared<float>(1, q);
 
     // Pulled from NBody demo
     constexpr float kSofteningSquared = 1e-3;
     constexpr float kG = 6.67259e-11;
 
-    for (int s = 1; s <= simSteps; ++s) {
+    long count = 0;
+    while(!shouldStopSimulating.load()) {
         auto simStart = std::chrono::steady_clock::now();
         float kenergy = 0;
-        try {
-            // Simulate
-            q.submit([&](handler& handler) {
-                auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
-                handler.parallel_for(particleRange, [=](nd_item<1> it) {
-                    auto i = it.get_global_id();
-                    float acc0 = p[i].acceleration[0];
-                    float acc1 = p[i].acceleration[1];
-                    float acc2 = p[i].acceleration[2];
-                    for (int j = 0; j < particleCount; j++) {
-                        float dx, dy, dz;
-                        float distance_sqr = 0.0;
-                        float distance_inv = 0.0;
 
-                        dx = p[j].position[0] - p[i].position[0];  // 1flop
-                        dy = p[j].position[1] - p[i].position[1];  // 1flop
-                        dz = p[j].position[2] - p[i].position[2];  // 1flop
+        {
+            buffer<Particle, 1> particleBuffer(particles.data(), particleCount,
+                { cl::sycl::property::buffer::use_host_ptr() });
 
-                        distance_sqr =
-                            dx * dx + dy * dy + dz * dz + kSofteningSquared;  // 6flops
-                        distance_inv = 1.0f / sycl::sqrt(distance_sqr);       // 1div+1sqrt
-
-                        acc0 += dx * kG * p[j].mass * distance_inv * distance_inv *
-                            distance_inv;  // 6flops
-                        acc1 += dy * kG * p[j].mass * distance_inv * distance_inv *
-                            distance_inv;  // 6flops
-                        acc2 += dz * kG * p[j].mass * distance_inv * distance_inv *
-                            distance_inv;  // 6flops
-                    }
-                    p[i].acceleration[0] = acc0;
-                    p[i].acceleration[1] = acc1;
-                    p[i].acceleration[2] = acc2;
-                    });
-                }).wait_and_throw();
-
-            // This bit seems to not work well in debug mode.
-            // Compute Kinetic Energy
-            // Second kernel updates the velocity and position for all particles
-            q.submit([&](handler& handler) {
-                auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
-                handler.parallel_for(nd_range<1>{ particleRange, 1 },
-                    ONEAPI::reduction(energy, 0.0f, std::plus<float>()), [=](nd_item<1> it, auto& energy) {
-
+            try {
+                // Simulate
+                q.submit([&](handler& handler) {
+                    auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
+                    handler.parallel_for(particleRange, [=](nd_item<1> it) {
                         auto i = it.get_global_id();
-                        p[i].velocity[0] += p[i].acceleration[0] * dt;  // 2flops
-                        p[i].velocity[1] += p[i].acceleration[1] * dt;  // 2flops
-                        p[i].velocity[2] += p[i].acceleration[2] * dt;  // 2flops
+                        float acc0 = p[i].acceleration[0];
+                        float acc1 = p[i].acceleration[1];
+                        float acc2 = p[i].acceleration[2];
+                        for (int j = 0; j < particleCount; j++) {
+                            float dx, dy, dz;
+                            float distance_sqr = 0.0;
+                            float distance_inv = 0.0;
 
-                        p[i].position[0] += p[i].velocity[0] * dt;  // 2flops
-                        p[i].position[1] += p[i].velocity[1] * dt;  // 2flops
-                        p[i].position[2] += p[i].velocity[2] * dt;  // 2flops
+                            dx = p[j].position[0] - p[i].position[0];  // 1flop
+                            dy = p[j].position[1] - p[i].position[1];  // 1flop
+                            dz = p[j].position[2] - p[i].position[2];  // 1flop
 
-                        p[i].acceleration[0] = 0.f;
-                        p[i].acceleration[1] = 0.f;
-                        p[i].acceleration[2] = 0.f;
+                            distance_sqr =
+                                dx * dx + dy * dy + dz * dz + kSofteningSquared;  // 6flops
+                            distance_inv = 1.0f / sycl::sqrt(distance_sqr);       // 1div+1sqrt
 
-                        energy += (p[i].mass *
-                            (p[i].velocity[0] * p[i].velocity[0] + p[i].velocity[1] * p[i].velocity[1] +
-                                p[i].velocity[2] * p[i].velocity[2]));  // 7flops
-                    });
-                }).wait_and_throw();
+                            acc0 += dx * kG * p[j].mass * distance_inv * distance_inv *
+                                distance_inv;  // 6flops
+                            acc1 += dy * kG * p[j].mass * distance_inv * distance_inv *
+                                distance_inv;  // 6flops
+                            acc2 += dz * kG * p[j].mass * distance_inv * distance_inv *
+                                distance_inv;  // 6flops
+                        }
+                        p[i].acceleration[0] = acc0;
+                        p[i].acceleration[1] = acc1;
+                        p[i].acceleration[2] = acc2;
+                        });
+                    }).wait_and_throw();
 
-            kenergy = 0.5 * (*energy);
-            *energy = 0.f;
+                    // This bit seems to not work well in debug mode.
+                    // Compute Kinetic Energy
+                    // Second kernel updates the velocity and position for all particles
+                    q.submit([&](handler& handler) {
+                        auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
+                        handler.parallel_for(nd_range<1>{ particleRange, 1 },
+                            ONEAPI::reduction(energy, 0.0f, std::plus<float>()), [=](nd_item<1> it, auto& energy) {
+
+                                auto i = it.get_global_id();
+                                p[i].velocity[0] += p[i].acceleration[0] * dt;  // 2flops
+                                p[i].velocity[1] += p[i].acceleration[1] * dt;  // 2flops
+                                p[i].velocity[2] += p[i].acceleration[2] * dt;  // 2flops
+
+                                p[i].position[0] += p[i].velocity[0] * dt;  // 2flops
+                                p[i].position[1] += p[i].velocity[1] * dt;  // 2flops
+                                p[i].position[2] += p[i].velocity[2] * dt;  // 2flops
+
+                                p[i].acceleration[0] = 0.f;
+                                p[i].acceleration[1] = 0.f;
+                                p[i].acceleration[2] = 0.f;
+
+                                energy += (p[i].mass *
+                                    (p[i].velocity[0] * p[i].velocity[0] + p[i].velocity[1] * p[i].velocity[1] +
+                                        p[i].velocity[2] * p[i].velocity[2]));  // 7flops
+                            });
+                        }).wait_and_throw();
+
+                        kenergy = 0.5 * (*energy);
+                        *energy = 0.f;
+            }
+            catch (sycl::exception const& e) {
+                std::cout << "SYCL DPC++ Exception:" << std::endl
+                    << e.what() << std::endl;
+            }
         }
-        catch (sycl::exception const& e) {
-            std::cout << "SYCL DPC++ Exception:" << std::endl
-                << e.what() << std::endl;
+
+        if (hasReadUpdate.load())
+        {
+            hasReadUpdate = false;
+
+            particlePositions.clear();
+            for (const Particle& particle: particles)
+            {
+                particlePositions.push_back(particle.position);
+            }
+
+            shouldReadUpdate = true;
         }
 
         // Log simulation status
         float elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(
             std::chrono::steady_clock::now() - simStart).count();
-        if ((s % reportInterval) == 0) { // Output status every 2 steps
+        if ((count % reportInterval) == 0) { // Output status every 2 steps
             float gflops = 1e-9 * ((11. + 18.) * particleCount * particleCount + particleCount * 19.);
-            std::cout << " " << std::left << std::setw(8) << s << std::left
-                << std::setprecision(5) << std::setw(8) << s * dt
+            std::cout << " " << std::left << std::setw(8) << count << std::left
+                << std::setprecision(5) << std::setw(8) << count * dt
                 << std::left << std::setprecision(5) << std::setw(12)
                 << kenergy << std::left << std::setprecision(5)
                 << std::setw(12) << elapsed_seconds << std::left
                 << std::setprecision(5) << std::setw(12)
                 << gflops * reportInterval / elapsed_seconds << std::endl;
-        }
+        } 
+
+        count++;
     }
 
     std::cout << "Done with simulation!" << std::endl;
 }
 
 void RenderThread() {
-    renderer = new Renderer();
+    renderer = new Renderer(
+        &shouldReadUpdate, &hasReadUpdate, &particlePositions);
     if (!renderer->Init())
     {
         std::cout << "Failed to initialize the GUI" << std::endl;
@@ -211,9 +237,12 @@ void RenderThread() {
 
     renderer->Teardown();
     delete renderer;
+
+    shouldStopSimulating = true;
 }
 
 int main() {
+    particlePositions = std::vector<glm::vec3>();
 
 #if defined(ENABLE_GUI)
   std::thread rendererThread (&RenderThread);

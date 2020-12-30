@@ -4,9 +4,12 @@
 #include "Input.h"
 #include "Renderer.h"
 
-Renderer::Renderer() : 
-    guiRenderer(), opengl("DPC++ Demo"), shaderFactory(), axis() {
-
+Renderer::Renderer(
+    std::atomic<bool>* shouldReadUpdate, std::atomic<bool>* hasReadUpdate,
+    std::vector<glm::vec3>* particlePositions) :
+    guiRenderer(), opengl("DPC++ Demo"), shaderFactory(), axis(), particleRenderer(),
+    shouldReadUpdate(shouldReadUpdate), hasReadUpdate(hasReadUpdate),
+    particlePositions(particlePositions) {
 }
 
 bool Renderer::Init() {
@@ -43,8 +46,14 @@ bool Renderer::Init() {
         return false;
     }
 
-    updateOrder = { &guiRenderer, &viewer, &axis, &fpsCounter };
-    renderOrder = { &viewer, &axis, &fpsCounter, &guiRenderer };
+    if (!particleRenderer.Init(shaderFactory))
+    {
+        std::cout << "Unable to load ParticleRenderer!" << std::endl;
+        return false;
+    }
+
+    updateOrder = { &guiRenderer, &viewer, &axis, &particleRenderer, &fpsCounter };
+    renderOrder = { &viewer, &axis, &particleRenderer, &fpsCounter, &guiRenderer };
     return true;
 }
 
@@ -65,7 +74,12 @@ void Renderer::update(float currentTime, float frameTime)
         item->Update(currentTime, frameTime, camera);
     }
 
-    // world.Update(viewer.GetCamera().position, currentTime, frameTime);
+    if (shouldReadUpdate->load()) {
+        particleRenderer.Transfer(particlePositions);
+
+        *shouldReadUpdate = false;
+        *hasReadUpdate = true;
+    }
 }
 
 void Renderer::render(float currentTime, glm::mat4& viewMatrix)
@@ -77,8 +91,6 @@ void Renderer::render(float currentTime, glm::mat4& viewMatrix)
     const GLfloat depth = 1.0f;
     glClearBufferfv(GL_COLOR, 0, color);
     glClearBufferfv(GL_DEPTH, 0, &depth);
-
-    // world.Render(projectionMatrix);
 
     for (const auto& item : renderOrder)
     {

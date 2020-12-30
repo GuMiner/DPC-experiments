@@ -84,6 +84,9 @@
     <ClCompile Include="Axis.cpp">
       <Filter>Source Files\Display</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleRenderer.cpp">
+      <Filter>Source Files\Display</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeviceQuerier.h">
@@ -147,6 +150,9 @@
       <Filter>Header Files\Display\OpenGL\Vbo</Filter>
     </ClInclude>
     <ClInclude Include="Axis.h">
+      <Filter>Header Files\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleRenderer.h">
       <Filter>Header Files\Display</Filter>
     </ClInclude>
   </ItemGroup>
