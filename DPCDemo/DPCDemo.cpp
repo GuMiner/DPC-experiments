@@ -89,7 +89,7 @@ std::atomic<bool> shouldStopSimulating(false);
 void SimulateParticles() {
     long particleCount = 16000;
     long reportInterval = 2;
-    float dt = 0.001f;
+    float dt = 0.0001f;
 
     std::vector<Particle> particles;
 
@@ -138,7 +138,7 @@ void SimulateParticles() {
 
                             distance_sqr =
                                 dx * dx + dy * dy + dz * dz + kSofteningSquared;  // 6flops
-                            distance_inv = 1.0f / sycl::sqrt(distance_sqr);       // 1div+1sqrt
+                            distance_inv = 100.0f / sycl::sqrt(distance_sqr);       // 1div+1sqrt
 
                             acc0 += dx * kG * p[j].mass * distance_inv * distance_inv *
                                 distance_inv;  // 6flops
@@ -153,10 +153,10 @@ void SimulateParticles() {
                         });
                     }).wait_and_throw();
 
-                    // This bit seems to not work well in debug mode.
-                    // Compute Kinetic Energy
-                    // Second kernel updates the velocity and position for all particles
-                    q.submit([&](handler& handler) {
+                // This bit seems to not work well in debug mode.
+                // Compute Kinetic Energy
+                // Second kernel updates the velocity and position for all particles
+                q.submit([&](handler& handler) {
                         auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
                         handler.parallel_for(nd_range<1>{ particleRange, 1 },
                             ONEAPI::reduction(energy, 0.0f, std::plus<float>()), [=](nd_item<1> it, auto& energy) {
@@ -169,10 +169,23 @@ void SimulateParticles() {
                                 p[i].position[0] += p[i].velocity[0] * dt;  // 2flops
                                 p[i].position[1] += p[i].velocity[1] * dt;  // 2flops
                                 p[i].position[2] += p[i].velocity[2] * dt;  // 2flops
-
+                              
                                 p[i].acceleration[0] = 0.f;
                                 p[i].acceleration[1] = 0.f;
                                 p[i].acceleration[2] = 0.f;
+
+                                // Handle bounding box boundary conditions
+                                //for (int j = 0; j < 3; j++) {
+                                //    if (p[i].position[j] < 0) {
+                                //        p[i].velocity[j] = -p[i].velocity[j];
+                                //        p[i].position[j] = -p[i].position[j];
+                                //    }
+                                //
+                                //    if (p[i].position[j] > 1) {
+                                //        p[i].velocity[j] = -p[i].velocity[j];
+                                //        p[i].position[j] = 2 - p[i].position[j];
+                                //    }
+                                //}
 
                                 energy += (p[i].mass *
                                     (p[i].velocity[0] * p[i].velocity[0] + p[i].velocity[1] * p[i].velocity[1] +
@@ -180,8 +193,8 @@ void SimulateParticles() {
                             });
                         }).wait_and_throw();
 
-                        kenergy = 0.5 * (*energy);
-                        *energy = 0.f;
+                kenergy = 0.5 * (*energy);
+                *energy = 0.f;
             }
             catch (sycl::exception const& e) {
                 std::cout << "SYCL DPC++ Exception:" << std::endl

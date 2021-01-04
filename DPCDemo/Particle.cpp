@@ -2,8 +2,8 @@
 
 Particle::Particle(Random& random) :
 	position(random.ZeroToOne(), random.ZeroToOne(), random.ZeroToOne()),
-	velocity(random.NegOneToOne(), random.NegOneToOne(), random.NegOneToOne()),
+	velocity(random.NegOneToOne() * 10.0f, random.NegOneToOne() * 10.0f, random.NegOneToOne() * 10.0f),
 	acceleration(0, 0, 0),
-	mass(random.ZeroToOne() + 1.0f) {
+	mass(random.ZeroToOne() * 10.0f + 1.0f) {
 
 }

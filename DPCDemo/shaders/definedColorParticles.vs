@@ -10,6 +10,6 @@ out vec4 fs_color;
 void main(void)
 {
 	fs_color = color;
-	gl_PointSize = 10.0f;
+	gl_PointSize = 5.0f;
     gl_Position = projectionMatrix * vec4(position, 1.0f);
 }

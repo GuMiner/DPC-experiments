@@ -14,7 +14,8 @@ struct Camera
 
     // LH coordinate system, Z+ is into the screen with X+ == left, Y+ == up
     Camera() :
-        position(glm::vec3(0, 0, -6.0f)), forwards(glm::vec3(0, 0, 1)), up(glm::vec3(0, 1, 0))
+        position(glm::vec3(3.18f, 2.31f, 1.85f)),
+        forwards(glm::vec3(-0.75f, -0.53f, -0.40f)), up(glm::vec3(-0.30f, -0.26f, 0.92f))
     {
         ComputeNormals();
     }
