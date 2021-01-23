@@ -15,10 +15,12 @@
 #endif
 
 #if ENABLE_GUI
+
 #include "Renderer.h"
 Renderer* renderer;
 #endif
 
+#include "ModelLoader.h"
 #include "DeviceQuerier.h"
 #include "Particle.h"
 #include "Random.h"
@@ -257,9 +259,14 @@ void RenderThread() {
 int main() {
     particlePositions = std::vector<glm::vec3>();
 
+    auto modelLoader = new ModelLoader();
+    modelLoader->LoadAndRender();
+
 #if defined(ENABLE_GUI)
   std::thread rendererThread (&RenderThread);
 #endif
+
+
 
   SimulateParticles();
 

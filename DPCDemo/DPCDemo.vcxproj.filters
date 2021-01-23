@@ -87,6 +87,9 @@
     <ClCompile Include="ParticleRenderer.cpp">
       <Filter>Source Files\Display</Filter>
     </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeviceQuerier.h">
@@ -154,6 +157,9 @@
     </ClInclude>
     <ClInclude Include="ParticleRenderer.h">
       <Filter>Header Files\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
