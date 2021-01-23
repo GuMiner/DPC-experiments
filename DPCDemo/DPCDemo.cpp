@@ -47,7 +47,7 @@ queue create_device_queue() {
 #else
   // the default device selector: it will select the most performant device
   // available at runtime.
-  default_selector dselector;
+  cpu_selector dselector;
 #endif
 
   // create an async exception handler so the program fails more gracefully.
@@ -74,7 +74,7 @@ queue create_device_queue() {
     return q;
   } catch (cl::sycl::exception const &e) {
     // catch the exception from devices that are not supported.
-    std::cout << "An exception is caught when creating a device queue." << std::endl;
+    std::cout << "An exception is caught when creating a device queue: " << e.what() << std::endl;
     std::cout << EXCEPTION_MSG;
     std::terminate();
   }
@@ -87,7 +87,7 @@ std::atomic<bool> hasReadUpdate(true);
 std::atomic<bool> shouldStopSimulating(false);
 
 void SimulateParticles() {
-    long particleCount = 16000;
+    long particleCount = 1024;
     long reportInterval = 2;
     float dt = 0.0001f;
 
