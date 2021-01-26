@@ -17,7 +17,7 @@
 GLFWwindow* ImguiRenderer::window;
 
 ImguiRenderer::ImguiRenderer()
-    : mouseWheelPos(0.0), program({})
+    : program({}), mouseWheelPos(0.0)
 {
     for (int i = 0; i < 3; i++)
     {

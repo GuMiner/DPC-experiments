@@ -49,7 +49,8 @@ queue create_device_queue() {
 #else
   // the default device selector: it will select the most performant device
   // available at runtime.
-  cpu_selector dselector;
+  host_selector dselector;
+  // default_selector dselector;
 #endif
 
   // create an async exception handler so the program fails more gracefully.
@@ -103,7 +104,7 @@ void SimulateParticles() {
 
     queue q = create_device_queue();
     DeviceQuerier::OutputDeviceInfo(q.get_device());
-
+    DeviceQuerier::OutputAllDeviceInfo();
     range<1> particleRange(particleCount);
     float* energy = malloc_shared<float>(1, q);
 
@@ -160,8 +161,9 @@ void SimulateParticles() {
                 // Second kernel updates the velocity and position for all particles
                 q.submit([&](handler& handler) {
                         auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
-                        handler.parallel_for(nd_range<1>{ particleRange, 1 },
-                            ONEAPI::reduction(energy, 0.0f, std::plus<float>()), [=](nd_item<1> it, auto& energy) {
+                        handler.parallel_for(particleRange, [=](nd_item<1> it) {
+                        //handler.parallel_for(nd_range<1>{ particleRange, 1 },
+                           // ONEAPI::reduction(energy, 0.0f, std::plus<float>()), [=](nd_item<1> it, auto& energy) {
 
                                 auto i = it.get_global_id();
                                 p[i].velocity[0] += p[i].acceleration[0] * dt;  // 2flops
@@ -189,9 +191,9 @@ void SimulateParticles() {
                                 //    }
                                 //}
 
-                                energy += (p[i].mass *
-                                    (p[i].velocity[0] * p[i].velocity[0] + p[i].velocity[1] * p[i].velocity[1] +
-                                        p[i].velocity[2] * p[i].velocity[2]));  // 7flops
+                             //   energy += (p[i].mass *
+                                //    (p[i].velocity[0] * p[i].velocity[0] + p[i].velocity[1] * p[i].velocity[1] +
+                            //            p[i].velocity[2] * p[i].velocity[2]));  // 7flops
                             });
                         }).wait_and_throw();
 

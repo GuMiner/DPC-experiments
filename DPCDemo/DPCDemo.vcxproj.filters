@@ -1,165 +1,149 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Display">
-      <UniqueIdentifier>{203ec5fd-e6ef-4ae8-abe2-180dd3d085ca}</UniqueIdentifier>
+    <Filter Include="DPCDemo">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\Display">
+    <Filter Include="DPCDemo\Display">
       <UniqueIdentifier>{3c32488c-ffac-4e8a-8ea9-5091bef52cac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Input">
-      <UniqueIdentifier>{91428bfb-c981-48bf-9f0b-2884181edb3d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Input">
-      <UniqueIdentifier>{8264ef84-9f7a-422f-a04c-1565b7647da3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Display\OpenGL">
+    <Filter Include="DPCDemo\Display\OpenGL">
       <UniqueIdentifier>{b6d061c7-cae4-49f0-86d1-3636f5b570ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Display\OpenGL">
-      <UniqueIdentifier>{813b9455-850f-4b57-8a28-b0ad4493e1c0}</UniqueIdentifier>
+    <Filter Include="DPCDemo\Display\OpenGL\Vbo">
+      <UniqueIdentifier>{45250c82-d69e-4944-b580-c543114ae4ce}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Display\Infra">
+    <Filter Include="DPCDemo\Display\Infra">
       <UniqueIdentifier>{682e8c13-1b67-4a00-95cc-dd3d384173cf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Display\Infra">
-      <UniqueIdentifier>{fece95a1-3730-4057-912d-f9a36f5e3772}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Display\OpenGL\Vbo">
-      <UniqueIdentifier>{45250c82-d69e-4944-b580-c543114ae4ce}</UniqueIdentifier>
+    <Filter Include="DPCDemo\Input">
+      <UniqueIdentifier>{8264ef84-9f7a-422f-a04c-1565b7647da3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DPCDemo.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>DPCDemo</Filter>
     </ClCompile>
     <ClCompile Include="DeviceQuerier.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>DPCDemo</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
-      <Filter>Source Files\Input</Filter>
+      <Filter>DPCDemo\Input</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files\Display</Filter>
+      <Filter>DPCDemo\Display</Filter>
     </ClCompile>
     <ClCompile Include="OpenGl.cpp">
-      <Filter>Source Files\Display\OpenGL</Filter>
+      <Filter>DPCDemo\Display\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="OpenGlCapabilities.cpp">
-      <Filter>Source Files\Display\OpenGL</Filter>
+      <Filter>DPCDemo\Display\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="DefaultMotionTranslator.cpp">
-      <Filter>Source Files\Input</Filter>
+      <Filter>DPCDemo\Input</Filter>
     </ClCompile>
     <ClCompile Include="FpsCounter.cpp">
-      <Filter>Source Files\Display\Infra</Filter>
+      <Filter>DPCDemo\Display\Infra</Filter>
     </ClCompile>
     <ClCompile Include="ImguiRenderer.cpp">
-      <Filter>Source Files\Display\Infra</Filter>
+      <Filter>DPCDemo\Display\Infra</Filter>
     </ClCompile>
     <ClCompile Include="Viewer.cpp">
-      <Filter>Source Files\Display\Infra</Filter>
+      <Filter>DPCDemo\Display\Infra</Filter>
     </ClCompile>
     <ClCompile Include="ShaderFactory.cpp">
-      <Filter>Source Files\Display\Infra</Filter>
+      <Filter>DPCDemo\Display\Infra</Filter>
     </ClCompile>
     <ClCompile Include="Random.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>DPCDemo</Filter>
     </ClCompile>
     <ClCompile Include="Particle.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>DPCDemo</Filter>
     </ClCompile>
     <ClCompile Include="Axis.cpp">
-      <Filter>Source Files\Display</Filter>
+      <Filter>DPCDemo\Display</Filter>
     </ClCompile>
     <ClCompile Include="ParticleRenderer.cpp">
-      <Filter>Source Files\Display</Filter>
+      <Filter>DPCDemo\Display</Filter>
     </ClCompile>
     <ClCompile Include="ModelLoader.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>DPCDemo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DeviceQuerier.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IMotionTranslator.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="IGlfwKeyHandler.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="IGlfwMouseHandler.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Header Files\Display</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGl.h">
-      <Filter>Header Files\Display\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGlCapabilities.h">
-      <Filter>Header Files\Display\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="DefaultMotionTranslator.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderFactory.h">
-      <Filter>Header Files\Display\Infra</Filter>
-    </ClInclude>
-    <ClInclude Include="FpsCounter.h">
-      <Filter>Header Files\Display\Infra</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files\Display\Infra</Filter>
-    </ClInclude>
-    <ClInclude Include="ImguiRenderer.h">
-      <Filter>Header Files\Display\Infra</Filter>
-    </ClInclude>
-    <ClInclude Include="Viewer.h">
-      <Filter>Header Files\Display\Infra</Filter>
-    </ClInclude>
-    <ClInclude Include="IRenderable.h">
-      <Filter>Header Files\Display</Filter>
-    </ClInclude>
-    <ClInclude Include="Particle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Random.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="VboBase.hpp">
-      <Filter>Header Files\Display\OpenGL\Vbo</Filter>
+      <Filter>DPCDemo\Display\OpenGL\Vbo</Filter>
     </ClInclude>
     <ClInclude Include="PositionVbo.hpp">
-      <Filter>Header Files\Display\OpenGL\Vbo</Filter>
+      <Filter>DPCDemo\Display\OpenGL\Vbo</Filter>
     </ClInclude>
     <ClInclude Include="ColorVbo.hpp">
-      <Filter>Header Files\Display\OpenGL\Vbo</Filter>
+      <Filter>DPCDemo\Display\OpenGL\Vbo</Filter>
     </ClInclude>
-    <ClInclude Include="Axis.h">
-      <Filter>Header Files\Display</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleRenderer.h">
-      <Filter>Header Files\Display</Filter>
+    <ClInclude Include="DeviceQuerier.h">
+      <Filter>DPCDemo</Filter>
     </ClInclude>
     <ClInclude Include="ModelLoader.h">
-      <Filter>Header Files</Filter>
+      <Filter>DPCDemo</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>DPCDemo</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.h">
+      <Filter>DPCDemo</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>DPCDemo\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="Axis.h">
+      <Filter>DPCDemo\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderable.h">
+      <Filter>DPCDemo\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleRenderer.h">
+      <Filter>DPCDemo\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGl.h">
+      <Filter>DPCDemo\Display\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGlCapabilities.h">
+      <Filter>DPCDemo\Display\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Viewer.h">
+      <Filter>DPCDemo\Display\Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>DPCDemo\Display\Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="FpsCounter.h">
+      <Filter>DPCDemo\Display\Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="ImguiRenderer.h">
+      <Filter>DPCDemo\Display\Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderFactory.h">
+      <Filter>DPCDemo\Display\Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultMotionTranslator.h">
+      <Filter>DPCDemo\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="IGlfwKeyHandler.h">
+      <Filter>DPCDemo\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="IGlfwMouseHandler.h">
+      <Filter>DPCDemo\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="IMotionTranslator.h">
+      <Filter>DPCDemo\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>DPCDemo\Input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

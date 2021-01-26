@@ -4,8 +4,8 @@
 #include "Viewer.h"
 
 Viewer::Viewer()
-    : fovY(30.0f), aspectRatio(1.77778f), nearPlane(0.10f), farPlane(1000.0f),
-    ScreenWidth(1280), ScreenHeight(720), MaxFramerate(120), camera()
+    : fovY(30.0f), aspectRatio(1.77778f), nearPlane(0.10f), farPlane(1000.0f), camera(),
+    ScreenWidth(1280), ScreenHeight(720), MaxFramerate(120)
 {
     motionTranslator = new DefaultMotionTranslator();
     UpdateMatrices();
