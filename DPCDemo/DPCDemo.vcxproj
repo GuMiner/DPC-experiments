@@ -109,6 +109,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="DefaultMotionTranslator.h" />
     <ClInclude Include="IRenderable.h" />
+    <ClInclude Include="FanMesh.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="OpenGl.h" />
     <ClInclude Include="OpenGlCapabilities.h" />
@@ -118,6 +119,7 @@
     <ClInclude Include="Random.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ShaderFactory.h" />
+    <ClInclude Include="SimConstants.h" />
     <ClInclude Include="VboBase.hpp" />
     <ClInclude Include="Viewer.h" />
   </ItemGroup>

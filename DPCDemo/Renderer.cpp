@@ -6,10 +6,10 @@
 
 Renderer::Renderer(
     std::atomic<bool>* shouldReadUpdate, std::atomic<bool>* hasReadUpdate,
-    std::vector<glm::vec3>* particlePositions) :
+    std::vector<glm::vec3>* particlePositions, std::atomic<bool>* reset) :
     guiRenderer(), opengl("DPC++ Demo"), shaderFactory(), axis(), particleRenderer(),
     shouldReadUpdate(shouldReadUpdate), hasReadUpdate(hasReadUpdate),
-    particlePositions(particlePositions) {
+    particlePositions(particlePositions), reset(reset) {
 }
 
 bool Renderer::Init() {
@@ -79,6 +79,11 @@ void Renderer::update(float currentTime, float frameTime)
 
         *shouldReadUpdate = false;
         *hasReadUpdate = true;
+    }
+
+    if (Input::IsKeyPressed(GLFW_KEY_R))
+    {
+        *reset = true; // Results in multiple resets, but that isn't a problem.
     }
 }
 

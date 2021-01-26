@@ -33,10 +33,11 @@ class Renderer
 	std::atomic<bool>* shouldReadUpdate;
 	std::atomic<bool>* hasReadUpdate;
 	std::vector<glm::vec3>* particlePositions;
+	std::atomic<bool>* reset;
 
 public:
 	Renderer(std::atomic<bool>* shouldReadUpdate, std::atomic<bool>* hasReadUpdate,
-		std::vector<glm::vec3>* particlePositions);
+		std::vector<glm::vec3>* particlePositions, std::atomic<bool>* reset);
 	bool Init();
 	void Teardown();
 	

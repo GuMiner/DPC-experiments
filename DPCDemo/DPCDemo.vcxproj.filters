@@ -145,5 +145,11 @@
     <ClInclude Include="Input.h">
       <Filter>DPCDemo\Input</Filter>
     </ClInclude>
+    <ClInclude Include="FanMesh.h">
+      <Filter>DPCDemo</Filter>
+    </ClInclude>
+    <ClInclude Include="SimConstants.h">
+      <Filter>DPCDemo</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -83,13 +83,22 @@ queue create_device_queue() {
   }
 }
 
+// TO GUI
 std::vector<glm::vec3> particlePositions;
 std::atomic<bool> shouldReadUpdate(false);
-std::atomic<bool> hasReadUpdate(true);
 
+// FROM GUI
+std::atomic<bool> hasReadUpdate(true);
+std::atomic<bool> reset(false);
 std::atomic<bool> shouldStopSimulating(false);
 
 void SimulateParticles() {
+    // Simulation details:
+    // Particles from 0 to 10
+    // Fan mesh centered at 5, 5, 4
+    // Rescaled to be sized at 3, 3, <etc>
+
+
     long particleCount = 1024;
     long reportInterval = 2;
     float dt = 0.0001f;
@@ -114,6 +123,16 @@ void SimulateParticles() {
 
     long count = 0;
     while(!shouldStopSimulating.load()) {
+        if (reset.load()) {
+            particles.clear();
+            for (long i = 0; i < particleCount; i++)
+            {
+                particles.push_back(Particle(randomGenerator));
+            }
+
+            reset = false;
+        }
+
         auto simStart = std::chrono::steady_clock::now();
         float kenergy = 0;
 
@@ -130,7 +149,7 @@ void SimulateParticles() {
                         float acc0 = p[i].acceleration[0];
                         float acc1 = p[i].acceleration[1];
                         float acc2 = p[i].acceleration[2];
-                        for (int j = 0; j < particleCount; j++) {
+                        for (int j = 0; j < 1; j++) { // particleCount >>>>>> Should drastically speed up performance, at the cost of not doing the right thing.
                             float dx, dy, dz;
                             float distance_sqr = 0.0;
                             float distance_inv = 0.0;
@@ -241,7 +260,7 @@ void SimulateParticles() {
 
 void RenderThread() {
     renderer = new Renderer(
-        &shouldReadUpdate, &hasReadUpdate, &particlePositions);
+        &shouldReadUpdate, &hasReadUpdate, &particlePositions, &reset);
     if (!renderer->Init())
     {
         std::cout << "Failed to initialize the GUI" << std::endl;
