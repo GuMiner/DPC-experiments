@@ -17,6 +17,7 @@ Renderer* renderer;
 #include "DeviceQuerier.h"
 #include "ModelLoader.h"
 #include "Particle.h"
+#include "RandData.h"
 #include "Random.h"
 
 using namespace cl::sycl;
@@ -83,10 +84,23 @@ queue create_device_queue() {
   }
 }
 
+void ResetRandomBuffer(Random& randomGenerator, std::vector<RandData>& randomBuffer)
+{
+    // It's very painful to generate random number generators (no API support)
+    // So, do it on the host and pass that back to the device https://www.khronos.org/files/sycl/sycl-12-reference-card.pdf
+    randomBuffer.clear();
+    for (long i = 0; i < PARTICLE_COUNT; i++)
+    {
+        randomBuffer.push_back(RandData(randomGenerator));
+    }
+}
+
+
 void SimulateParticles(FanMesh* fanMesh) {
     queue q = create_device_queue();
 
     std::vector<Particle> particles;
+    std::vector<RandData> randomData;
 
     Random randomGenerator = Random();
     for (long i = 0; i < PARTICLE_COUNT; i++)
@@ -94,6 +108,7 @@ void SimulateParticles(FanMesh* fanMesh) {
         particles.push_back(Particle(randomGenerator, fanMesh->min[2], fanMesh->max[2]));
     }
 
+    ResetRandomBuffer(randomGenerator, randomData);
     range<1> particleRange(PARTICLE_COUNT);
 
     long count = 0;
@@ -113,7 +128,10 @@ void SimulateParticles(FanMesh* fanMesh) {
         auto simStart = std::chrono::steady_clock::now();
 
         {
-            buffer<Particle, 1> particleBuffer(particles.data(), PARTICLE_COUNT,
+            buffer<Particle, 1> particleBuffer(particles.data(), particles.size(),
+                { cl::sycl::property::buffer::use_host_ptr() });
+
+            buffer<RandData, 1> randomBuffer(randomData.data(), randomData.size(),
                 { cl::sycl::property::buffer::use_host_ptr() });
 
             try {
@@ -154,39 +172,28 @@ void SimulateParticles(FanMesh* fanMesh) {
                 // Kernel 2
                 q.submit([&](handler& handler) {
                     auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
+                    auto r = randomBuffer.get_access<cl::sycl::access::mode::read>(handler);
                     handler.parallel_for(particleRange, [=](nd_item<1> it) {
-                            auto i = it.get_global_id();
+                        auto i = it.get_global_id();
 
-                            // Move particles
-                            p[i].velocity[0] += p[i].acceleration[0] * TIME_STEP;
-                            p[i].velocity[1] += p[i].acceleration[1] * TIME_STEP;
-                            p[i].velocity[2] += p[i].acceleration[2] * TIME_STEP;
+                        // Move particles
+                        p[i].velocity += p[i].acceleration * TIME_STEP;
+                        p[i].position += p[i].velocity * TIME_STEP;
+                      
+                        p[i].acceleration = glm::vec3(0.0f, 0.0f, 0.0f);
 
-                            p[i].position[0] += p[i].velocity[0] * TIME_STEP;
-                            p[i].position[1] += p[i].velocity[1] * TIME_STEP;
-                            p[i].position[2] += p[i].velocity[2] * TIME_STEP;
-                          
-                            p[i].acceleration[0] = 0.0f;
-                            p[i].acceleration[1] = 0.0f;
-                            p[i].acceleration[2] = 0.0f;
+                        // Simulate infinite particles by randomly adding in a particle at the edge
+                        // (only if this particle has gone past the edge)
+                        if (p[i].position[0] < 0 || p[i].position[1] < 0 || p[i].position[2] < 0 ||
+                            p[i].position[0] > SIM_MAX || p[i].position[1] > SIM_MAX || p[i].position[2] > SIM_MAX)
+                        {
+                            // TODO put the particle on the planes.
 
-                            // Simulate infinite particles by randomly adding in a particle at the edge,
-                            //  if the particle has gone outside of the edge.
-
-                            // Handle bounding box boundary conditions
-                            //for (int j = 0; j < 3; j++) {
-                            //    if (p[i].position[j] < 0) {
-                            //        p[i].velocity[j] = -p[i].velocity[j];
-                            //        p[i].position[j] = -p[i].position[j];
-                            //    }
-                            //
-                            //    if (p[i].position[j] > 1) {
-                            //        p[i].velocity[j] = -p[i].velocity[j];
-                            //        p[i].position[j] = 2 - p[i].position[j];
-                            //    }
-                            //}
-                        });
-                    }).wait_and_throw();
+                            // Give it a new random velocity
+                            p[i].velocity = r[i].velocity;
+                        }
+                    });
+                }).wait_and_throw();
             }
             catch (sycl::exception const& e) {
                 std::cout << "SYCL DPC++ Exception:" << std::endl
@@ -208,6 +215,9 @@ void SimulateParticles(FanMesh* fanMesh) {
             shouldReadUpdate = true;
         }
 #endif
+
+        // Prepare for the next iteration.
+        ResetRandomBuffer(randomGenerator, randomData);
 
         // Log simulation status
         float elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(

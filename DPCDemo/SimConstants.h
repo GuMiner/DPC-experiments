@@ -19,7 +19,7 @@
 #define SIM_STATS_REPORT_INTERVAL 50
 #define SIM_MAX 10.0f
 #define RAND_GENERATOR_SEED 4321
-#define TIME_STEP 0.0001f
+#define TIME_STEP 0.01f
 
 // Particle simulation details
 #define PARTICLE_COUNT 2048

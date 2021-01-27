@@ -91,6 +91,7 @@
     <ClCompile Include="OpenGlCapabilities.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleRenderer.cpp" />
+    <ClCompile Include="RandData.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ShaderFactory.cpp" />
@@ -116,6 +117,7 @@
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleRenderer.h" />
     <ClInclude Include="PositionVbo.hpp" />
+    <ClInclude Include="RandData.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ShaderFactory.h" />
