@@ -1,9 +1,23 @@
+#include "SimConstants.h"
 #include "Particle.h"
 
-Particle::Particle(Random& random) :
-	position(random.ZeroToOne(), random.ZeroToOne(), random.ZeroToOne()),
-	velocity(random.NegOneToOne() * 10.0f, random.NegOneToOne() * 10.0f, random.NegOneToOne() * 10.0f),
+Particle::Particle(Random& random, float zMin, float zMax) :
+	position(random.ZeroToOne() * SIM_MAX, random.ZeroToOne() * SIM_MAX, 0),
+	velocity(
+		random.NegOneToOne() * INIT_RAND_VELOCITY,
+		random.NegOneToOne() * INIT_RAND_VELOCITY,
+		random.NegOneToOne() * INIT_RAND_VELOCITY),
 	acceleration(0, 0, 0),
-	mass(random.ZeroToOne() * 10.0f + 1.0f) {
-
+	mass(PARTICLE_MASS)
+{
+	// Don't randomly place particles from zMin to zMax (the fan)
+	float zRange = (SIM_MAX - (zMax - zMin)) * random.ZeroToOne();
+	if (zRange < zMin)
+	{
+		position.z = zRange;
+	}
+	else
+	{
+		position.z = zMax + (zRange - zMin);
+	}
 }

@@ -1,4 +1,6 @@
 #include <iostream>
+
+#include "SimConstants.h"
 #include "Axis.h"
 
 Axis::Axis() : 
@@ -18,20 +20,67 @@ bool Axis::Init(ShaderFactory& shaderFactory) {
 	positionVbo.SetupOpenGlBuffers();
 	colorVbo.SetupOpenGlBuffers();
 
+	// RGB (XYZ) axis
 	positionVbo.vertices.push_back(glm::vec3(0, 0, 0));
-	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
-	positionVbo.vertices.push_back(glm::vec3(1, 0, 0));
+	colorVbo.vertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, 0, 0));
 	colorVbo.vertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
 
 	positionVbo.vertices.push_back(glm::vec3(0, 0, 0));
-	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
-	positionVbo.vertices.push_back(glm::vec3(0, 1, 0));
+	colorVbo.vertices.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	positionVbo.vertices.push_back(glm::vec3(0, SIM_MAX, 0));
 	colorVbo.vertices.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
 
 	positionVbo.vertices.push_back(glm::vec3(0, 0, 0));
-	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
-	positionVbo.vertices.push_back(glm::vec3(0, 0, 1));
 	colorVbo.vertices.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	positionVbo.vertices.push_back(glm::vec3(0, 0, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+
+	// Bounding box edges
+	positionVbo.vertices.push_back(glm::vec3(0, SIM_MAX, 0));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+	positionVbo.vertices.push_back(glm::vec3(0, SIM_MAX, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, 0, 0));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, 0, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+
+	positionVbo.vertices.push_back(glm::vec3(0, 0, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+	positionVbo.vertices.push_back(glm::vec3(0, SIM_MAX, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, 0, 0));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, SIM_MAX, 0));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+
+	positionVbo.vertices.push_back(glm::vec3(0, SIM_MAX, 0));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, SIM_MAX, 0));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+
+	positionVbo.vertices.push_back(glm::vec3(0, 0, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, 0, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+
+	positionVbo.vertices.push_back(glm::vec3(0, SIM_MAX, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, SIM_MAX, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, 0, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, SIM_MAX, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, SIM_MAX, 0));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
+	positionVbo.vertices.push_back(glm::vec3(SIM_MAX, SIM_MAX, SIM_MAX));
+	colorVbo.vertices.push_back(glm::vec3(0.9f, 0.9f, 0.9f));
 
 	positionVbo.TransferToOpenGl();
 	colorVbo.TransferToOpenGl();

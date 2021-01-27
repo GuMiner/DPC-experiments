@@ -1,8 +1,3 @@
-#define ENABLE_GUI 1
-
-#define FPGA 0
-#define FPGA_EMULATOR 0
-
 #include <array>
 #include <iomanip>
 #include <iostream>
@@ -10,28 +5,33 @@
 #include <thread>
 #include <vector>
 #include <CL/sycl.hpp>
-#if FPGA || FPGA_EMULATOR
 #include <CL/sycl/INTEL/fpga_extensions.hpp>
-#endif
+
+#include "SimConstants.h"
 
 #if ENABLE_GUI
-
 #include "Renderer.h"
 Renderer* renderer;
 #endif
 
-#include "ModelLoader.h"
 #include "DeviceQuerier.h"
+#include "ModelLoader.h"
 #include "Particle.h"
 #include "Random.h"
 
 using namespace cl::sycl;
 
-// output message for runtime exceptions
-#define EXCEPTION_MSG \
-  "    If you are targeting an FPGA hardware, please ensure that an FPGA board is plugged to the system, \n\
-        set up correctly and compile with -DFPGA  \n\
-    If you are targeting the FPGA emulator, compile with -DFPGA_EMULATOR.\n"
+#if ENABLE_GUI
+// TO GUI
+std::vector<glm::vec3> particlePositions;
+std::atomic<bool> shouldReadUpdate(false);
+
+// FROM GUI
+std::atomic<bool> hasReadUpdate(true);
+std::atomic<bool> reset(false);
+#endif
+
+std::atomic<bool> shouldStopSimulating(false);
 
 //************************************
 // Function description: create a device queue with the default selector or
@@ -46,10 +46,12 @@ queue create_device_queue() {
 #elif FPGA
   // DPC++ extension: FPGA selector on systems with FPGA card
   INTEL::fpga_selector dselector;
+#elif GPU
+    gpu_selector dselector;
 #else
   // the default device selector: it will select the most performant device
   // available at runtime.
-  host_selector dselector;
+  cpu_selector dselector;
   // default_selector dselector;
 #endif
 
@@ -58,11 +60,9 @@ queue create_device_queue() {
     for (std::exception_ptr const &e : exceptionList) {
       try {
         std::rethrow_exception(e);
-      } catch (cl::sycl::exception const &e) {
-        std::cout << "Caught an asynchronous DPC++ exception, terminating the "
-                     "program."
-                  << std::endl;
-        std::cout << EXCEPTION_MSG;
+      }
+      catch (cl::sycl::exception const &e) {
+        std::cout << "Caught an asynchronous DPC++ exception, terminating the program: " << e.what() << std::endl;
         std::terminate();
       }
     }
@@ -73,71 +73,47 @@ queue create_device_queue() {
     // handler to catch async runtime errors the device queue is used to enqueue
     // the kernels and encapsulates all the states needed for execution
     queue q(dselector, ehandler);
+    DeviceQuerier::OutputDeviceInfo(q.get_device());
 
     return q;
   } catch (cl::sycl::exception const &e) {
     // catch the exception from devices that are not supported.
-    std::cout << "An exception is caught when creating a device queue: " << e.what() << std::endl;
-    std::cout << EXCEPTION_MSG;
+    std::cout << "An exception was caught when creating a device queue: " << e.what() << std::endl;
     std::terminate();
   }
 }
 
-// TO GUI
-std::vector<glm::vec3> particlePositions;
-std::atomic<bool> shouldReadUpdate(false);
-
-// FROM GUI
-std::atomic<bool> hasReadUpdate(true);
-std::atomic<bool> reset(false);
-std::atomic<bool> shouldStopSimulating(false);
-
-void SimulateParticles() {
-    // Simulation details:
-    // Particles from 0 to 10
-    // Fan mesh centered at 5, 5, 4
-    // Rescaled to be sized at 3, 3, <etc>
-
-
-    long particleCount = 1024;
-    long reportInterval = 2;
-    float dt = 0.0001f;
+void SimulateParticles(FanMesh* fanMesh) {
+    queue q = create_device_queue();
 
     std::vector<Particle> particles;
 
     Random randomGenerator = Random();
-    for (long i = 0; i < particleCount; i++)
+    for (long i = 0; i < PARTICLE_COUNT; i++)
     {
-        particles.push_back(Particle(randomGenerator));
+        particles.push_back(Particle(randomGenerator, fanMesh->min[2], fanMesh->max[2]));
     }
 
-    queue q = create_device_queue();
-    DeviceQuerier::OutputDeviceInfo(q.get_device());
-    DeviceQuerier::OutputAllDeviceInfo();
-    range<1> particleRange(particleCount);
-    float* energy = malloc_shared<float>(1, q);
-
-    // Pulled from NBody demo
-    constexpr float kSofteningSquared = 1e-3;
-    constexpr float kG = 6.67259e-11;
+    range<1> particleRange(PARTICLE_COUNT);
 
     long count = 0;
     while(!shouldStopSimulating.load()) {
+#if ENABLE_GUI
         if (reset.load()) {
             particles.clear();
-            for (long i = 0; i < particleCount; i++)
+            for (long i = 0; i < PARTICLE_COUNT; i++)
             {
-                particles.push_back(Particle(randomGenerator));
+                particles.push_back(Particle(randomGenerator, fanMesh->min[2], fanMesh->max[2]));
             }
 
             reset = false;
         }
+#endif
 
         auto simStart = std::chrono::steady_clock::now();
-        float kenergy = 0;
 
         {
-            buffer<Particle, 1> particleBuffer(particles.data(), particleCount,
+            buffer<Particle, 1> particleBuffer(particles.data(), PARTICLE_COUNT,
                 { cl::sycl::property::buffer::use_host_ptr() });
 
             try {
@@ -159,14 +135,14 @@ void SimulateParticles() {
                             dz = p[j].position[2] - p[i].position[2];  // 1flop
 
                             distance_sqr =
-                                dx * dx + dy * dy + dz * dz + kSofteningSquared;  // 6flops
+                                dx * dx + dy * dy + dz * dz + NEARBY_PARTICLE_SOFTENING_CONST;  // 6flops
                             distance_inv = 100.0f / sycl::sqrt(distance_sqr);       // 1div+1sqrt
 
-                            acc0 += dx * kG * p[j].mass * distance_inv * distance_inv *
+                            acc0 += dx * GRAVITY_CONST * p[j].mass * distance_inv * distance_inv *
                                 distance_inv;  // 6flops
-                            acc1 += dy * kG * p[j].mass * distance_inv * distance_inv *
+                            acc1 += dy * GRAVITY_CONST * p[j].mass * distance_inv * distance_inv *
                                 distance_inv;  // 6flops
-                            acc2 += dz * kG * p[j].mass * distance_inv * distance_inv *
+                            acc2 += dz * GRAVITY_CONST * p[j].mass * distance_inv * distance_inv *
                                 distance_inv;  // 6flops
                         }
                         p[i].acceleration[0] = acc0;
@@ -175,49 +151,42 @@ void SimulateParticles() {
                         });
                     }).wait_and_throw();
 
-                // This bit seems to not work well in debug mode.
-                // Compute Kinetic Energy
-                // Second kernel updates the velocity and position for all particles
+                // Kernel 2
                 q.submit([&](handler& handler) {
-                        auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
-                        handler.parallel_for(particleRange, [=](nd_item<1> it) {
-                        //handler.parallel_for(nd_range<1>{ particleRange, 1 },
-                           // ONEAPI::reduction(energy, 0.0f, std::plus<float>()), [=](nd_item<1> it, auto& energy) {
+                    auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
+                    handler.parallel_for(particleRange, [=](nd_item<1> it) {
+                            auto i = it.get_global_id();
 
-                                auto i = it.get_global_id();
-                                p[i].velocity[0] += p[i].acceleration[0] * dt;  // 2flops
-                                p[i].velocity[1] += p[i].acceleration[1] * dt;  // 2flops
-                                p[i].velocity[2] += p[i].acceleration[2] * dt;  // 2flops
+                            // Move particles
+                            p[i].velocity[0] += p[i].acceleration[0] * TIME_STEP;
+                            p[i].velocity[1] += p[i].acceleration[1] * TIME_STEP;
+                            p[i].velocity[2] += p[i].acceleration[2] * TIME_STEP;
 
-                                p[i].position[0] += p[i].velocity[0] * dt;  // 2flops
-                                p[i].position[1] += p[i].velocity[1] * dt;  // 2flops
-                                p[i].position[2] += p[i].velocity[2] * dt;  // 2flops
-                              
-                                p[i].acceleration[0] = 0.f;
-                                p[i].acceleration[1] = 0.f;
-                                p[i].acceleration[2] = 0.f;
+                            p[i].position[0] += p[i].velocity[0] * TIME_STEP;
+                            p[i].position[1] += p[i].velocity[1] * TIME_STEP;
+                            p[i].position[2] += p[i].velocity[2] * TIME_STEP;
+                          
+                            p[i].acceleration[0] = 0.0f;
+                            p[i].acceleration[1] = 0.0f;
+                            p[i].acceleration[2] = 0.0f;
 
-                                // Handle bounding box boundary conditions
-                                //for (int j = 0; j < 3; j++) {
-                                //    if (p[i].position[j] < 0) {
-                                //        p[i].velocity[j] = -p[i].velocity[j];
-                                //        p[i].position[j] = -p[i].position[j];
-                                //    }
-                                //
-                                //    if (p[i].position[j] > 1) {
-                                //        p[i].velocity[j] = -p[i].velocity[j];
-                                //        p[i].position[j] = 2 - p[i].position[j];
-                                //    }
-                                //}
+                            // Simulate infinite particles by randomly adding in a particle at the edge,
+                            //  if the particle has gone outside of the edge.
 
-                             //   energy += (p[i].mass *
-                                //    (p[i].velocity[0] * p[i].velocity[0] + p[i].velocity[1] * p[i].velocity[1] +
-                            //            p[i].velocity[2] * p[i].velocity[2]));  // 7flops
-                            });
-                        }).wait_and_throw();
-
-                kenergy = 0.5 * (*energy);
-                *energy = 0.f;
+                            // Handle bounding box boundary conditions
+                            //for (int j = 0; j < 3; j++) {
+                            //    if (p[i].position[j] < 0) {
+                            //        p[i].velocity[j] = -p[i].velocity[j];
+                            //        p[i].position[j] = -p[i].position[j];
+                            //    }
+                            //
+                            //    if (p[i].position[j] > 1) {
+                            //        p[i].velocity[j] = -p[i].velocity[j];
+                            //        p[i].position[j] = 2 - p[i].position[j];
+                            //    }
+                            //}
+                        });
+                    }).wait_and_throw();
             }
             catch (sycl::exception const& e) {
                 std::cout << "SYCL DPC++ Exception:" << std::endl
@@ -225,6 +194,7 @@ void SimulateParticles() {
             }
         }
 
+#if ENABLE_GUI
         if (hasReadUpdate.load())
         {
             hasReadUpdate = false;
@@ -237,25 +207,30 @@ void SimulateParticles() {
 
             shouldReadUpdate = true;
         }
+#endif
 
         // Log simulation status
         float elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(
             std::chrono::steady_clock::now() - simStart).count();
-        if ((count % reportInterval) == 0) { // Output status every 2 steps
-            float gflops = 1e-9 * ((11. + 18.) * particleCount * particleCount + particleCount * 19.);
-            std::cout << " " << std::left << std::setw(8) << count << std::left
-                << std::setprecision(5) << std::setw(8) << count * dt
-                << std::left << std::setprecision(5) << std::setw(12)
-                << kenergy << std::left << std::setprecision(5)
-                << std::setw(12) << elapsed_seconds << std::left
-                << std::setprecision(5) << std::setw(12)
-                << gflops * reportInterval / elapsed_seconds << std::endl;
+        if ((count % SIM_STATS_REPORT_INTERVAL) == 0)
+        {
+            std::cout << "  " << 
+                count << ": " << 
+                count * TIME_STEP << " sec (in " <<
+                elapsed_seconds << " sec)." << std::endl;
         } 
 
         count++;
+
+// GUI runs forever for diagnostics.
+#if !ENABLE_GUI
+        if (count == MAX_SIMULATION_STEPS) {
+            shouldStopSimulating = true;
+        }
+#endif
     }
 
-    std::cout << "Done with simulation!" << std::endl;
+    std::cout << "Done." << std::endl;
 }
 
 void RenderThread() {
@@ -278,23 +253,26 @@ void RenderThread() {
 }
 
 int main() {
+    // TODO -- make an argument.
+    std::string path = std::string("test-fans/plane.stl");
+
     particlePositions = std::vector<glm::vec3>();
 
-    auto modelLoader = new ModelLoader();
-    modelLoader->LoadAndRender();
+    ModelLoader* modelLoader = new ModelLoader();
+    FanMesh* fanMesh = new FanMesh();
+    modelLoader->Load(path, fanMesh);
 
-#if defined(ENABLE_GUI)
-  std::thread rendererThread (&RenderThread);
+#if ENABLE_GUI
+    std::thread rendererThread (&RenderThread);
 #endif
 
+    SimulateParticles(fanMesh);
 
-
-  SimulateParticles();
-
-
-#if defined(ENABLE_GUI)
-  rendererThread.join();
+#if ENABLE_GUI
+    rendererThread.join();
 #endif
 
-  return 0;
+    delete modelLoader;
+    delete fanMesh;
+    return 0;
 }

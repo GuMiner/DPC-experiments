@@ -54,6 +54,8 @@ void Viewer::UpdateMatrices()
 void Viewer::Render(float currentTime, const glm::mat4& projectionMatrix)
 {
     ImGui::Begin("Camera");
+    ImGui::SetWindowSize(ImVec2(200, 110), ImGuiCond_Once);
+    ImGui::SetWindowPos(ImVec2(10, 10), ImGuiCond_Once);
     ImGui::InputFloat3("Position", &camera.position[0], 2);
     ImGui::InputFloat3("Look At", &camera.forwards[0], 2);
     ImGui::InputFloat3("Up", &camera.up[0], 2);

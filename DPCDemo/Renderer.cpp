@@ -122,7 +122,7 @@ void Renderer::Run()
         }
 
         float now = (float)glfwGetTime();
-        lastFrameTime = (now - gameTime);
+        lastFrameTime = (now - gameTime) + 1e-6f; // Frame times of 0 break things.
         gameTime += lastFrameTime;
 
         // Delay to run approximately at our maximum framerate.

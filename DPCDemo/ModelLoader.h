@@ -4,7 +4,6 @@
 class ModelLoader
 {
 public:
-	void Load(std::string path, FanMesh& fanMesh);
-	void LoadAndRender();
+	void Load(std::string path, FanMesh* fanMesh);
 };
 

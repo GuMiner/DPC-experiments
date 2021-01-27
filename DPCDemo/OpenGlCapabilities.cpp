@@ -7,6 +7,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #pragma clang diagnostic pop
+
+#include "SimConstants.h"
 #include "OpenGlCapabilities.h"
 
 void OpenGlCapabilities::GetRendererCapabilities()
@@ -60,10 +62,11 @@ void OpenGlCapabilities::Initialize()
 void OpenGlCapabilities::LogRetrievedInformation()
 {
     // Renderer
-    std::cout << "Concurrency count: " << logicalCoreCount << std::endl;
-
-    std::cout << "OpenGL vendor: " << vendor << ", renderer: " << renderer
+    std::cout << "Display OpenGL vendor: " << vendor << ", renderer: " << renderer
         << ", version: " << version << std::endl;
+
+#if VERBOSE_RENDERER_LOGS
+    std::cout << "  CPU Cores: " << logicalCoreCount << std::endl;
     std::cout << "Shading Language Versions Supported:" << std::endl; 
     for (const std::string& version : shadingLanguageVersions)
     {
@@ -83,6 +86,7 @@ void OpenGlCapabilities::LogRetrievedInformation()
     // Uniforms
     std::cout << "Max Uniform Size: " << maxUniformBlockSize << ", max Vertex Uniform Blocks: " <<
         maxVertexUniformBlocks << ", Max Fragment Uniform Blocks: " << maxFragmentUniformBlocks << std::endl; 
+#endif
 }
 
 std::string OpenGlCapabilities::GetPlatform()

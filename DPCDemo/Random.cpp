@@ -1,9 +1,11 @@
 #include <random>
 #include <functional>
+
+#include "SimConstants.h"
 #include "Random.h"
 
 Random::Random() : 
-	randomDevice(), generator(4321), negOneToOne(-1.0, 1.0), zeroToOne(0.0, 1.0)
+	randomDevice(), generator(RAND_GENERATOR_SEED), negOneToOne(-1.0, 1.0), zeroToOne(0.0, 1.0)
 {
 }
 

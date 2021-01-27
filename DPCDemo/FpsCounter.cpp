@@ -21,7 +21,8 @@ void FpsCounter::Update(float currentTime, float lastFrameTime, const Camera& ca
 void FpsCounter::Render(float currentTime, const glm::mat4& projectionMatrix)
 {
     ImGui::Begin("FPS", nullptr);
-    ImGui::SetWindowSize(ImVec2(100, 100));
+    ImGui::SetWindowSize(ImVec2(50, 50), ImGuiCond_Once);
+    ImGui::SetWindowPos(ImVec2(10, 130), ImGuiCond_Once);
     ImGui::SetCursorPos(ImVec2(5, 20));
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%.0f", lastFrameRate);
     ImGui::End();

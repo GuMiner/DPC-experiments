@@ -4,7 +4,7 @@
 
 struct Particle {
 public:
-	Particle(Random& random);
+	Particle(Random& random, float zMin, float zMax);
 
 	glm::vec3 position;
 	glm::vec3 velocity;

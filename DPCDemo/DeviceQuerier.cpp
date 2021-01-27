@@ -1,5 +1,6 @@
 #include <magic_enum.hpp>
 
+#include "SimConstants.h"
 #include "DeviceQuerier.h"
 
 #pragma region Enum Conversions
@@ -84,6 +85,7 @@ void DeviceQuerier::OutputDeviceInfo(const cl::sycl::device& dev)
 		<< plat.get_info<cl::sycl::info::platform::profile>()
 		<< " (" << dev.get_info<cl::sycl::info::device::profile>() << ")" << std::endl;
 
+#if VERBOSE_DEVICE_LOGS
 	std::cout << "  Extensions: " << std::endl
 		<< plat.get_info<cl::sycl::info::platform::extensions>();
 	std::cout << "  Device Extensions: " << std::endl
@@ -228,6 +230,7 @@ void DeviceQuerier::OutputDeviceInfo(const cl::sycl::device& dev)
 		<< magic_enum::enum_name(dev.get_info<cl::sycl::info::device::partition_type_affinity_domain>()) << std::endl;
 	std::cout << "  Reference Count: "
 		<< dev.get_info<cl::sycl::info::device::reference_count>() << std::endl;
+#endif
 }
 
 
