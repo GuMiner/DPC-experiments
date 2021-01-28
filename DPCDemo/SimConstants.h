@@ -14,7 +14,7 @@
 #define VERBOSE_RENDERER_LOGS 0
 
 #define MOUSE_ROTATION_SPEED 0.001f
-#define KEYBOARD_MOVEMENT_SPEED 4.0f
+#define KEYBOARD_MOVEMENT_SPEED 8.0f
 #define KEYBOARD_ROLL_SPEED 0.5f
 
 // ---------- Simulation ----------

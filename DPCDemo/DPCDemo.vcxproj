@@ -86,6 +86,7 @@
     <ClCompile Include="ImguiRenderer.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="DefaultMotionTranslator.cpp" />
+    <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="OpenGl.cpp" />
     <ClCompile Include="OpenGlCapabilities.cpp" />
@@ -111,7 +112,9 @@
     <ClInclude Include="DefaultMotionTranslator.h" />
     <ClInclude Include="IRenderable.h" />
     <ClInclude Include="FanMesh.h" />
+    <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="ModelLoader.h" />
+    <ClInclude Include="NormalVbo.hpp" />
     <ClInclude Include="OpenGl.h" />
     <ClInclude Include="OpenGlCapabilities.h" />
     <ClInclude Include="Particle.h" />
@@ -124,6 +127,19 @@
     <ClInclude Include="SimConstants.h" />
     <ClInclude Include="VboBase.hpp" />
     <ClInclude Include="Viewer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="fonts\DejaVuSans.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\definedColor.fs" />
+    <None Include="shaders\definedColor.vs" />
+    <None Include="shaders\definedColorParticles.fs" />
+    <None Include="shaders\definedColorParticles.vs" />
+    <None Include="shaders\imgui.fs" />
+    <None Include="shaders\imgui.vs" />
+    <None Include="shaders\mesh.fs" />
+    <None Include="shaders\mesh.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

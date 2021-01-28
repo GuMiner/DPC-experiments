@@ -20,6 +20,12 @@
     <Filter Include="DPCDemo\Input">
       <UniqueIdentifier>{8264ef84-9f7a-422f-a04c-1565b7647da3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="fonts">
+      <UniqueIdentifier>{cbd505ac-7774-4364-a518-831691907cae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{cfdf5486-168a-42a6-b0dd-3aa948eecb50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DPCDemo.cpp">
@@ -72,6 +78,9 @@
     </ClCompile>
     <ClCompile Include="RandData.cpp">
       <Filter>DPCDemo</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshRenderer.cpp">
+      <Filter>DPCDemo\Display</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -153,5 +162,42 @@
     <ClInclude Include="RandData.h">
       <Filter>DPCDemo</Filter>
     </ClInclude>
+    <ClInclude Include="MeshRenderer.h">
+      <Filter>DPCDemo\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="NormalVbo.hpp">
+      <Filter>DPCDemo\Display\OpenGL\Vbo</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="fonts\DejaVuSans.ttf">
+      <Filter>fonts</Filter>
+    </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\definedColor.fs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\definedColor.vs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\definedColorParticles.fs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\definedColorParticles.vs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\imgui.fs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\imgui.vs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\mesh.fs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\mesh.vs">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

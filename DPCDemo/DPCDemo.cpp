@@ -32,6 +32,7 @@ std::atomic<bool> hasReadUpdate(true);
 std::atomic<bool> reset(false);
 #endif
 
+FanMesh* fanMesh;
 std::atomic<bool> shouldStopSimulating(false);
 
 //************************************
@@ -271,7 +272,7 @@ void SimulateParticles(FanMesh* fanMesh) {
 void RenderThread() {
     renderer = new Renderer(
         &shouldReadUpdate, &hasReadUpdate, &particlePositions, &reset);
-    if (!renderer->Init())
+    if (!renderer->Init(fanMesh))
     {
         std::cout << "Failed to initialize the GUI" << std::endl;
         delete renderer;
@@ -294,7 +295,7 @@ int main() {
     particlePositions = std::vector<glm::vec3>();
 
     ModelLoader* modelLoader = new ModelLoader();
-    FanMesh* fanMesh = new FanMesh();
+    fanMesh = new FanMesh();
     modelLoader->Load(path, fanMesh);
 
 #if ENABLE_GUI

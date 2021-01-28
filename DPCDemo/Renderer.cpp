@@ -7,13 +7,14 @@
 Renderer::Renderer(
     std::atomic<bool>* shouldReadUpdate, std::atomic<bool>* hasReadUpdate,
     std::vector<glm::vec3>* particlePositions, std::atomic<bool>* reset) :
-    guiRenderer(), opengl("DPC++ Demo"), shaderFactory(), axis(), particleRenderer(),
+    guiRenderer(), opengl("DPC++ Demo"), shaderFactory(), axis(),
+    fanRenderer(), particleRenderer(),
     shouldReadUpdate(shouldReadUpdate), hasReadUpdate(hasReadUpdate),
     particlePositions(particlePositions), reset(reset) {
 }
 
-bool Renderer::Init() {
-    // Setup GLFW
+bool Renderer::Init(FanMesh* fanMesh) {
+    // Infrastructure
     if (!glfwInit())
     {
         std::cout << "GLFW startup failure" << std::endl;
@@ -40,20 +41,29 @@ bool Renderer::Init() {
         return false;
     }
 
+    // Axis / bounding box
     if (!axis.Init(shaderFactory))
     {
         std::cout << "Unable to load Axis!" << std::endl;
         return false;
     }
 
+    // Particles 
     if (!particleRenderer.Init(shaderFactory))
     {
         std::cout << "Unable to load ParticleRenderer!" << std::endl;
         return false;
     }
 
-    updateOrder = { &guiRenderer, &viewer, &axis, &particleRenderer, &fpsCounter };
-    renderOrder = { &viewer, &axis, &particleRenderer, &fpsCounter, &guiRenderer };
+    // Fan
+    if (!fanRenderer.Init(shaderFactory, fanMesh->Vertices, fanMesh->Normals))
+    {
+        std::cout << "Unable to load MeshRenderer for the fan!" << std::endl;
+        return false;
+    }
+
+    updateOrder = { &guiRenderer, &viewer, &axis, &fanRenderer, &particleRenderer, &fpsCounter };
+    renderOrder = { &viewer, &axis, &fanRenderer, &particleRenderer, &fpsCounter, &guiRenderer };
     return true;
 }
 

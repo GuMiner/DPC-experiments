@@ -5,11 +5,14 @@
 #include <GLFW/glfw3.h>
 #pragma clang diagnostic pop
 #include <glm\mat4x4.hpp>
+
 #include "Axis.h"
+#include "FanMesh.h"
 #include "FpsCounter.h"
 #include "ImguiRenderer.h"
 #include "IRenderable.h"
 #include "OpenGl.h"
+#include "MeshRenderer.h"
 #include "ParticleRenderer.h"
 #include "ShaderFactory.h"
 #include "Viewer.h"
@@ -20,6 +23,7 @@ class Renderer
 	OpenGl opengl;
 	ShaderFactory shaderFactory;
 	Axis axis;
+	MeshRenderer fanRenderer;
 	ParticleRenderer particleRenderer;
 	FpsCounter fpsCounter;
 	Viewer viewer;
@@ -38,7 +42,7 @@ class Renderer
 public:
 	Renderer(std::atomic<bool>* shouldReadUpdate, std::atomic<bool>* hasReadUpdate,
 		std::vector<glm::vec3>* particlePositions, std::atomic<bool>* reset);
-	bool Init();
+	bool Init(FanMesh* fanMesh);
 	void Teardown();
 	
 	void Run();
