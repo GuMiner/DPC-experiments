@@ -7,7 +7,7 @@ struct RandData {
 public:
 	RandData(Random& random);
 
-	glm::vec2 position;
+	glm::vec3 position;
 	glm::vec3 velocity;
 
 	int plane;

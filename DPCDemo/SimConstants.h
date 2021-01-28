@@ -13,6 +13,10 @@
 #define ENABLE_MODEL_LOADER_DEBUG_VIEWER 0
 #define VERBOSE_RENDERER_LOGS 0
 
+#define MOUSE_ROTATION_SPEED 0.001f
+#define KEYBOARD_MOVEMENT_SPEED 4.0f
+#define KEYBOARD_ROLL_SPEED 0.5f
+
 // ---------- Simulation ----------
 // Overall simulation bounds
 #define MAX_SIMULATION_STEPS 100

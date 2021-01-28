@@ -184,10 +184,35 @@ void SimulateParticles(FanMesh* fanMesh) {
 
                         // Simulate infinite particles by randomly adding in a particle at the edge
                         // (only if this particle has gone past the edge)
-                        if (p[i].position[0] < 0 || p[i].position[1] < 0 || p[i].position[2] < 0 ||
-                            p[i].position[0] > SIM_MAX || p[i].position[1] > SIM_MAX || p[i].position[2] > SIM_MAX)
+                        if (p[i].position.x < 0 || p[i].position.y < 0 || p[i].position.z < 0 ||
+                            p[i].position.x > SIM_MAX || p[i].position.y > SIM_MAX || p[i].position.z > SIM_MAX)
                         {
-                            // TODO put the particle on the planes.
+                            // Add somewhere random
+                            p[i].position = r[i].position;
+
+                            // Flatten to one plane based on the randomly selected one.
+                            switch (r[i].plane)
+                            {
+                            case 0:
+                                p[i].position.x = 0;
+                                break;
+                            case 1:
+                                p[i].position.x = SIM_MAX;
+                                break;
+                            case 2:
+                                p[i].position.y = 0;
+                                break;
+                            case 3:
+                                p[i].position.y = SIM_MAX;
+                                break;
+                            case 4:
+                                p[i].position.z = 0;
+                                break;
+                            case 5:
+                            default:
+                                p[i].position.z = SIM_MAX;
+                                break;
+                            }
 
                             // Give it a new random velocity
                             p[i].velocity = r[i].velocity;
