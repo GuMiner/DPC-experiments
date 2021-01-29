@@ -272,7 +272,7 @@ void SimulateParticles(FanMesh* fanMesh) {
                                 p[i].position = intersectionPoint;
                                 p[i].velocity = glm::length(p[i].velocity) *
                                     glm::normalize(glm::reflect(p[i].velocity, closestNormal));
-                                os << p[i].velocity.x << ", " << p[i].velocity.y << ", " << p[i].velocity.z << endl;
+                                // os << p[i].velocity.x << ", " << p[i].velocity.y << ", " << p[i].velocity.z << endl;
                                 // TODO add (or subtract) energy in the bounce to account for the fan pushing air around.
                             }
                         }
@@ -427,6 +427,7 @@ void SimulateParticles(FanMesh* fanMesh) {
     std::cout << "Done." << std::endl;
 }
 
+#if ENABLE_GUI
 void RenderThread() {
     sync = new Synchronizer(&shouldStopSimulating);
     renderer = new Renderer(sync);
@@ -445,6 +446,7 @@ void RenderThread() {
 
     shouldStopSimulating = true;
 }
+#endif
 
 int main() {
     // TODO -- make an argument.

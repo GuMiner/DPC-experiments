@@ -24,10 +24,10 @@
 #define SIM_STATS_REPORT_INTERVAL 50
 #define SIM_MAX 10.0f
 #define RAND_GENERATOR_SEED 4321
-#define TIME_STEP 0.0001f
+#define TIME_STEP 0.00001f
 
 // Particle simulation details
-#define PARTICLE_COUNT 512
+#define PARTICLE_COUNT 2048
 
 // https://opentextbc.ca/universityphysicsv2openstax/chapter/pressure-temperature-and-rms-speed/
 #define PARTICLE_INIT_VELOCITY 511.0f // m / s, apx speed of sound
