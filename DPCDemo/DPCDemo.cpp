@@ -6,16 +6,22 @@
 #include <vector>
 #include <CL/sycl.hpp>
 #include <CL/sycl/INTEL/fpga_extensions.hpp>
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/gtx/norm.hpp>
+#include <glm/gtx/transform.hpp>
 
 #include "SimConstants.h"
 
 #if ENABLE_GUI
+#include "Synchronizer.h"
 #include "Renderer.h"
 Renderer* renderer;
 #endif
 
 #include "DeviceQuerier.h"
 #include "ModelLoader.h"
+#include "ExitingParticle.h"
 #include "Particle.h"
 #include "RandData.h"
 #include "Random.h"
@@ -23,13 +29,7 @@ Renderer* renderer;
 using namespace cl::sycl;
 
 #if ENABLE_GUI
-// TO GUI
-std::vector<glm::vec3> particlePositions;
-std::atomic<bool> shouldReadUpdate(false);
-
-// FROM GUI
-std::atomic<bool> hasReadUpdate(true);
-std::atomic<bool> reset(false);
+Synchronizer* sync;
 #endif
 
 FanMesh* fanMesh;
@@ -96,17 +96,32 @@ void ResetRandomBuffer(Random& randomGenerator, std::vector<RandData>& randomBuf
     }
 }
 
+glm::mat4 UpdateFanRotation(float angle)
+{
+    return glm::translate(glm::vec3(SIM_MAX / 2.0f, SIM_MAX / 2.0f, 0.0f)) *
+        glm::rotate(angle, glm::vec3(0.0f, 0.0f, 1.0f)) *
+        glm::translate(glm::vec3(-SIM_MAX / 2.0f, -SIM_MAX / 2.0f, 0.0f));
+}
+
 
 void SimulateParticles(FanMesh* fanMesh) {
     queue q = create_device_queue();
 
     std::vector<Particle> particles;
+    std::vector<ExitingParticle> exitingParticles;
     std::vector<RandData> randomData;
+
+    float fanZAngle = 0;
+    glm::mat4 fanRotationMatrix = UpdateFanRotation(fanZAngle);
 
     Random randomGenerator = Random();
     for (long i = 0; i < PARTICLE_COUNT; i++)
     {
         particles.push_back(Particle(randomGenerator, fanMesh->min[2], fanMesh->max[2]));
+        
+        ExitingParticle exitingParticle;
+        exitingParticle.valid = false;
+        exitingParticles.push_back(exitingParticle);
     }
 
     ResetRandomBuffer(randomGenerator, randomData);
@@ -115,19 +130,20 @@ void SimulateParticles(FanMesh* fanMesh) {
     long count = 0;
     while(!shouldStopSimulating.load()) {
 #if ENABLE_GUI
-        if (reset.load()) {
+        if (sync->reset.load()) {
             particles.clear();
             for (long i = 0; i < PARTICLE_COUNT; i++)
             {
                 particles.push_back(Particle(randomGenerator, fanMesh->min[2], fanMesh->max[2]));
             }
 
-            reset = false;
+            sync->reset = false;
         }
 #endif
 
         auto simStart = std::chrono::steady_clock::now();
 
+        // Enforce a scope so buffers close / return data to the host after each step.
         {
             buffer<Particle, 1> particleBuffer(particles.data(), particles.size(),
                 { cl::sycl::property::buffer::use_host_ptr() });
@@ -135,38 +151,32 @@ void SimulateParticles(FanMesh* fanMesh) {
             buffer<RandData, 1> randomBuffer(randomData.data(), randomData.size(),
                 { cl::sycl::property::buffer::use_host_ptr() });
 
+            buffer<ExitingParticle, 1> exitingBuffer(exitingParticles.data(), exitingParticles.size(),
+                { cl::sycl::property::buffer::use_host_ptr() });
+
             try {
-                // Simulate
+                // Simulate particle-vs-particle collisions.
                 q.submit([&](handler& handler) {
                     auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
                     handler.parallel_for(particleRange, [=](nd_item<1> it) {
                         auto i = it.get_global_id();
-                        float acc0 = p[i].acceleration[0];
-                        float acc1 = p[i].acceleration[1];
-                        float acc2 = p[i].acceleration[2];
-                        for (int j = 0; j < 1; j++) { // particleCount >>>>>> Should drastically speed up performance, at the cost of not doing the right thing.
-                            float dx, dy, dz;
-                            float distance_sqr = 0.0;
-                            float distance_inv = 0.0;
 
-                            dx = p[j].position[0] - p[i].position[0];  // 1flop
-                            dy = p[j].position[1] - p[i].position[1];  // 1flop
-                            dz = p[j].position[2] - p[i].position[2];  // 1flop
+                        glm::vec3 acc = glm::vec3(0.0f);
+                        for (int j = 0; j < PARTICLE_COUNT; j++) {
+                            glm::vec3 distance = p[j].position - p[i].position;
 
-                            distance_sqr =
-                                dx * dx + dy * dy + dz * dz + NEARBY_PARTICLE_SOFTENING_CONST;  // 6flops
-                            distance_inv = 100.0f / sycl::sqrt(distance_sqr);       // 1div+1sqrt
-
-                            acc0 += dx * GRAVITY_CONST * p[j].mass * distance_inv * distance_inv *
-                                distance_inv;  // 6flops
-                            acc1 += dy * GRAVITY_CONST * p[j].mass * distance_inv * distance_inv *
-                                distance_inv;  // 6flops
-                            acc2 += dz * GRAVITY_CONST * p[j].mass * distance_inv * distance_inv *
-                                distance_inv;  // 6flops
+                            // Only deal with repulsion if the particles are close together.
+                            float distanceSqd = glm::length2(distance);
+                            if (distanceSqd < SQUARED_REPULSION_DISTANCE)
+                            {
+                                float distance_inv = 1.0f / sycl::sqrt(distanceSqd + TOO_CLOSE_SOFTENING_CONST);
+                                
+                                // F = ma and Coulomb's law, approximately.
+                                acc += REPULSION_CONST * distance * distance_inv / p[i].mass;
+                            }
                         }
-                        p[i].acceleration[0] = acc0;
-                        p[i].acceleration[1] = acc1;
-                        p[i].acceleration[2] = acc2;
+
+                        p[i].acceleration = acc;
                         });
                     }).wait_and_throw();
 
@@ -180,7 +190,6 @@ void SimulateParticles(FanMesh* fanMesh) {
                         // Move particles
                         p[i].velocity += p[i].acceleration * TIME_STEP;
                         p[i].position += p[i].velocity * TIME_STEP;
-                      
                         p[i].acceleration = glm::vec3(0.0f, 0.0f, 0.0f);
 
                         // Simulate infinite particles by randomly adding in a particle at the edge
@@ -228,22 +237,15 @@ void SimulateParticles(FanMesh* fanMesh) {
         }
 
 #if ENABLE_GUI
-        if (hasReadUpdate.load())
-        {
-            hasReadUpdate = false;
-
-            particlePositions.clear();
-            for (const Particle& particle: particles)
-            {
-                particlePositions.push_back(particle.position);
-            }
-
-            shouldReadUpdate = true;
-        }
+        sync->UpdateParticlePositions(particles);
+        sync->UpdateFanPosition(fanRotationMatrix);
 #endif
 
         // Prepare for the next iteration.
         ResetRandomBuffer(randomGenerator, randomData);
+
+        fanZAngle += FAN_ROTATION_SPEED * TIME_STEP;
+        fanRotationMatrix = UpdateFanRotation(fanZAngle);
 
         // Log simulation status
         float elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(
@@ -270,8 +272,8 @@ void SimulateParticles(FanMesh* fanMesh) {
 }
 
 void RenderThread() {
-    renderer = new Renderer(
-        &shouldReadUpdate, &hasReadUpdate, &particlePositions, &reset);
+    sync = new Synchronizer(&shouldStopSimulating);
+    renderer = new Renderer(sync);
     if (!renderer->Init(fanMesh))
     {
         std::cout << "Failed to initialize the GUI" << std::endl;
@@ -291,8 +293,6 @@ void RenderThread() {
 int main() {
     // TODO -- make an argument.
     std::string path = std::string("test-fans/plane.stl");
-
-    particlePositions = std::vector<glm::vec3>();
 
     ModelLoader* modelLoader = new ModelLoader();
     fanMesh = new FanMesh();

@@ -96,6 +96,7 @@
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ShaderFactory.cpp" />
+    <ClCompile Include="Synchronizer.cpp" />
     <ClCompile Include="Viewer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +104,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ColorVbo.hpp" />
     <ClInclude Include="DeviceQuerier.h" />
+    <ClInclude Include="ExitingParticle.h" />
     <ClInclude Include="FpsCounter.h" />
     <ClInclude Include="IGlfwKeyHandler.h" />
     <ClInclude Include="IGlfwMouseHandler.h" />
@@ -125,6 +127,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ShaderFactory.h" />
     <ClInclude Include="SimConstants.h" />
+    <ClInclude Include="Synchronizer.h" />
     <ClInclude Include="VboBase.hpp" />
     <ClInclude Include="Viewer.h" />
   </ItemGroup>

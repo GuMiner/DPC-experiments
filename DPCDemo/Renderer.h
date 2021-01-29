@@ -15,10 +15,13 @@
 #include "MeshRenderer.h"
 #include "ParticleRenderer.h"
 #include "ShaderFactory.h"
+#include "Synchronizer.h"
 #include "Viewer.h"
 
 class Renderer
 {
+	Synchronizer* sync;
+
 	ImguiRenderer guiRenderer;
 	OpenGl opengl;
 	ShaderFactory shaderFactory;
@@ -34,14 +37,8 @@ class Renderer
 	void update(float currentTime, float frameTime);
 	void render(float currentTime, glm::mat4& viewMatrix);
 
-	std::atomic<bool>* shouldReadUpdate;
-	std::atomic<bool>* hasReadUpdate;
-	std::vector<glm::vec3>* particlePositions;
-	std::atomic<bool>* reset;
-
 public:
-	Renderer(std::atomic<bool>* shouldReadUpdate, std::atomic<bool>* hasReadUpdate,
-		std::vector<glm::vec3>* particlePositions, std::atomic<bool>* reset);
+	Renderer(Synchronizer* sync);
 	bool Init(FanMesh* fanMesh);
 	void Teardown();
 	

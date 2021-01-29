@@ -26,6 +26,9 @@
     <Filter Include="shaders">
       <UniqueIdentifier>{cfdf5486-168a-42a6-b0dd-3aa948eecb50}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DPCDemo\DataTypes">
+      <UniqueIdentifier>{cf692ab9-0911-4f6b-9973-7953d5e4e652}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DPCDemo.cpp">
@@ -64,9 +67,6 @@
     <ClCompile Include="Random.cpp">
       <Filter>DPCDemo</Filter>
     </ClCompile>
-    <ClCompile Include="Particle.cpp">
-      <Filter>DPCDemo</Filter>
-    </ClCompile>
     <ClCompile Include="Axis.cpp">
       <Filter>DPCDemo\Display</Filter>
     </ClCompile>
@@ -76,11 +76,17 @@
     <ClCompile Include="ModelLoader.cpp">
       <Filter>DPCDemo</Filter>
     </ClCompile>
-    <ClCompile Include="RandData.cpp">
-      <Filter>DPCDemo</Filter>
-    </ClCompile>
     <ClCompile Include="MeshRenderer.cpp">
       <Filter>DPCDemo\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="Synchronizer.cpp">
+      <Filter>DPCDemo</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>DPCDemo\DataTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="RandData.cpp">
+      <Filter>DPCDemo\DataTypes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,9 +103,6 @@
       <Filter>DPCDemo</Filter>
     </ClInclude>
     <ClInclude Include="ModelLoader.h">
-      <Filter>DPCDemo</Filter>
-    </ClInclude>
-    <ClInclude Include="Particle.h">
       <Filter>DPCDemo</Filter>
     </ClInclude>
     <ClInclude Include="Random.h">
@@ -153,13 +156,7 @@
     <ClInclude Include="Input.h">
       <Filter>DPCDemo\Input</Filter>
     </ClInclude>
-    <ClInclude Include="FanMesh.h">
-      <Filter>DPCDemo</Filter>
-    </ClInclude>
     <ClInclude Include="SimConstants.h">
-      <Filter>DPCDemo</Filter>
-    </ClInclude>
-    <ClInclude Include="RandData.h">
       <Filter>DPCDemo</Filter>
     </ClInclude>
     <ClInclude Include="MeshRenderer.h">
@@ -167,6 +164,21 @@
     </ClInclude>
     <ClInclude Include="NormalVbo.hpp">
       <Filter>DPCDemo\Display\OpenGL\Vbo</Filter>
+    </ClInclude>
+    <ClInclude Include="Synchronizer.h">
+      <Filter>DPCDemo</Filter>
+    </ClInclude>
+    <ClInclude Include="RandData.h">
+      <Filter>DPCDemo\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>DPCDemo\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="FanMesh.h">
+      <Filter>DPCDemo\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="ExitingParticle.h">
+      <Filter>DPCDemo\DataTypes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

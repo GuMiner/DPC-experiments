@@ -33,14 +33,14 @@ bool ParticleRenderer::Init(ShaderFactory& shaderFactory) {
 	return true;
 }
 
-void ParticleRenderer::Transfer(std::vector<glm::vec3>* particlePositions) {
+void ParticleRenderer::Transfer(std::vector<glm::vec3>& particlePositions) {
 	positionVbo.vertices.clear();
 	colorVbo.vertices.clear();
 	float h = 0.7f;
 	float s = 0.2f;
 	float v = 0.3f;
 
-	for (const glm::vec3& position : *particlePositions)
+	for (const glm::vec3& position : particlePositions)
 	{
 		positionVbo.vertices.push_back(position);
 
