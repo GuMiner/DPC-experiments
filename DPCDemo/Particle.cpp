@@ -9,7 +9,7 @@ Particle::Particle(Random& random, float zMin, float zMax) :
 	acceleration(0, 0, 0),
 	mass(PARTICLE_MASS)
 {
-	velocity = INIT_RAND_VELOCITY * glm::normalize(velocity);
+	velocity = PARTICLE_INIT_VELOCITY * glm::normalize(velocity);
 
 	// Don't randomly place particles from zMin to zMax (the fan)
 	float zRange = (SIM_MAX - (zMax - zMin)) * random.ZeroToOne();

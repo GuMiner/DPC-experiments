@@ -14,8 +14,11 @@
 #include "Input.h"
 #include "ImguiRenderer.h"
 
-GLFWwindow* ImguiRenderer::window;
+// Grabbed and refactored from a very old version of the backends list
+// https://github.com/ocornut/imgui/blob/master/backends/imgui_impl_glfw.cpp
+// TODO -- refactor this to something new.
 
+GLFWwindow* ImguiRenderer::window;
 ImguiRenderer::ImguiRenderer()
     : program({}), mouseWheelPos(0.0)
 {
@@ -136,7 +139,7 @@ void ImguiRenderer::Update(float currentTime, float frameTime, const Camera& _un
     io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
 
     // Setup time step
-    io.DeltaTime = frameTime;
+    io.DeltaTime = std::max(frameTime, 0.0001f); // Avoids crashes when the frame time is messed up from pauses.
 
     // Setup inputs
     // (we already got mouse wheel, keyboard keys & characters from glfw callbacks polled in glfwPollEvents())

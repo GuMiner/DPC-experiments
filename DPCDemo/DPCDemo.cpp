@@ -111,6 +111,12 @@ void SimulateParticles(FanMesh* fanMesh) {
     std::vector<ExitingParticle> exitingParticles;
     std::vector<RandData> randomData;
 
+    const float PARTICLE_DEFAULT_ENERGY = PARTICLE_MASS * PARTICLE_INIT_VELOCITY * PARTICLE_INIT_VELOCITY;
+    glm::vec3 exitingEnergyFlow = glm::vec3(0.0f);
+    glm::vec3 avgExitPosition = glm::vec3(0.0f);
+    long exitedParticles = 0;
+    float exitingTotalEnergy = 0.0f;
+
     float fanZAngle = 0;
     glm::mat4 fanRotationMatrix = UpdateFanRotation(fanZAngle);
 
@@ -184,6 +190,7 @@ void SimulateParticles(FanMesh* fanMesh) {
                 q.submit([&](handler& handler) {
                     auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
                     auto r = randomBuffer.get_access<cl::sycl::access::mode::read>(handler);
+                    auto e = exitingBuffer.get_access<cl::sycl::access::mode::write>(handler);
                     handler.parallel_for(particleRange, [=](nd_item<1> it) {
                         auto i = it.get_global_id();
 
@@ -197,7 +204,13 @@ void SimulateParticles(FanMesh* fanMesh) {
                         if (p[i].position.x < 0 || p[i].position.y < 0 || p[i].position.z < 0 ||
                             p[i].position.x > SIM_MAX || p[i].position.y > SIM_MAX || p[i].position.z > SIM_MAX)
                         {
-                            // Add somewhere random
+                            // Add this particle as an exiting particle for simulation results.
+                            e[i].valid = true;
+                            e[i].mass = p[i].mass;
+                            e[i].position = p[i].position;
+                            e[i].velocity = p[i].velocity;
+
+                            // Make a new particle somewhere random
                             p[i].position = r[i].position;
 
                             // Flatten to one plane based on the randomly selected one.
@@ -247,6 +260,23 @@ void SimulateParticles(FanMesh* fanMesh) {
         fanZAngle += FAN_ROTATION_SPEED * TIME_STEP;
         fanRotationMatrix = UpdateFanRotation(fanZAngle);
 
+        // Extract out particles that exited and updated the average energy flow out.
+        for (long i = 0; i < PARTICLE_COUNT; i++)
+        {
+            if (exitingParticles[i].valid)
+            {
+                // The particle's default energy is subtracted to avoid having to do that later.
+                // KE (vector) = m * v^2 (v vector normalized)
+                float energyFlowOut = exitingParticles[i].mass * glm::length2(exitingParticles[i].velocity) - PARTICLE_DEFAULT_ENERGY;
+                exitingEnergyFlow += (energyFlowOut * glm::normalize(exitingParticles[i].velocity));
+                exitingTotalEnergy += energyFlowOut;
+
+                ++exitedParticles;
+                avgExitPosition += exitingParticles[i].position;
+                exitingParticles[i].valid = false;
+            }
+        }
+
         // Log simulation status
         float elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(
             std::chrono::steady_clock::now() - simStart).count();
@@ -261,13 +291,34 @@ void SimulateParticles(FanMesh* fanMesh) {
         count++;
 
 // GUI runs forever for diagnostics.
-#if !ENABLE_GUI
+#if !ENABLE_GUI || AUTO_EXIT
         if (count == MAX_SIMULATION_STEPS) {
             shouldStopSimulating = true;
         }
 #endif
     }
 
+    // These results are going to have the default random flow of generated particles, in addition to any fan contributions.
+    // That's fine for me, because I am interested in the comparison of these values with other fans, not the absolute values.
+    avgExitPosition = avgExitPosition / (float)(exitedParticles + 1);
+    
+    // Validation sanity checks:
+    // - The exit position should be 5, 5, 5 on average (without a fan).
+    // - The directional energy flow should be very low (again, without a fan)
+    // - The energy transfer score should be > directionality performance score (always)
+    // - Both scores should be near zero (without a fan).
+    std::cout << "Average exit position: ("
+        << avgExitPosition[0] << ", "
+        << avgExitPosition[1] << ", "
+        << avgExitPosition[2] << "), with "
+        << exitedParticles << " particles." << std::endl;
+    std::cout << "Directional Energy Flow: ("
+        << exitingEnergyFlow[0] << ", "
+        << exitingEnergyFlow[1] << ", "
+        << exitingEnergyFlow[2] << ")." << std::endl;
+    std::cout << std::endl;
+    std::cout << "Energy Transfer Performance Score: " << exitingTotalEnergy << std::endl;
+    std::cout << "Directionality Performance Score: " << glm::length(exitingEnergyFlow) << std::endl;
     std::cout << "Done." << std::endl;
 }
 

@@ -19,7 +19,8 @@
 
 // ---------- Simulation ----------
 // Overall simulation bounds
-#define MAX_SIMULATION_STEPS 100
+#define AUTO_EXIT 1
+#define MAX_SIMULATION_STEPS 500
 #define SIM_STATS_REPORT_INTERVAL 50
 #define SIM_MAX 10.0f
 #define RAND_GENERATOR_SEED 4321
@@ -29,7 +30,7 @@
 #define PARTICLE_COUNT 512
 
 // https://opentextbc.ca/universityphysicsv2openstax/chapter/pressure-temperature-and-rms-speed/
-#define INIT_RAND_VELOCITY 511.0f // m / s, apx speed of sound
+#define PARTICLE_INIT_VELOCITY 511.0f // m / s, apx speed of sound
 
 // Real particles aren't this heavy, but there also are many more of them.
 #define PARTICLE_MASS 1.0f // kg, just to make the math nice.
