@@ -218,7 +218,7 @@ void SimulateParticles(FanMesh* fanMesh) {
                     auto fanMin = fanBoundsMinBuffer.get_access<cl::sycl::access::mode::read>(handler);
                     auto fanMax = fanBoundsMaxBuffer.get_access<cl::sycl::access::mode::read>(handler);
 
-                    // Debugging cl::sycl::stream os(1024, 128, handler);
+                    cl::sycl::stream os(1024, 128, handler); // For debugging
                     handler.parallel_for(particleRange, [=](nd_item<1> it) {
                         auto i = it.get_global_id();
 
@@ -272,6 +272,7 @@ void SimulateParticles(FanMesh* fanMesh) {
                                 p[i].position = intersectionPoint;
                                 p[i].velocity = glm::length(p[i].velocity) *
                                     glm::normalize(glm::reflect(p[i].velocity, closestNormal));
+                                os << p[i].velocity.x << ", " << p[i].velocity.y << ", " << p[i].velocity.z << endl;
                                 // TODO add (or subtract) energy in the bounce to account for the fan pushing air around.
                             }
                         }
@@ -308,32 +309,38 @@ void SimulateParticles(FanMesh* fanMesh) {
                             // Make a new particle somewhere random
                             p[i].position = r[i].position;
 
-                            // Flatten to one plane based on the randomly selected one.
+                            // Give it a new random velocity
+                            p[i].velocity = r[i].velocity;
+
+                            // Flatten to one plane based on the randomly selected one, making sure the velocity is away from that plane!
                             switch (r[i].plane)
                             {
                             case 0:
                                 p[i].position.x = 0;
+                                p[i].velocity.x = sycl::abs(p[i].velocity.x);
                                 break;
                             case 1:
                                 p[i].position.x = SIM_MAX;
+                                p[i].velocity.x = -sycl::abs(p[i].velocity.x);
                                 break;
                             case 2:
                                 p[i].position.y = 0;
+                                p[i].velocity.y = sycl::abs(p[i].velocity.y);
                                 break;
                             case 3:
                                 p[i].position.y = SIM_MAX;
+                                p[i].velocity.y = -sycl::abs(p[i].velocity.y);
                                 break;
                             case 4:
                                 p[i].position.z = 0;
+                                p[i].velocity.z = sycl::abs(p[i].velocity.z);
                                 break;
                             case 5:
                             default:
                                 p[i].position.z = SIM_MAX;
+                                p[i].velocity.z = -sycl::abs(p[i].velocity.z);
                                 break;
                             }
-
-                            // Give it a new random velocity
-                            p[i].velocity = r[i].velocity;
                         }
                     });
                 });
