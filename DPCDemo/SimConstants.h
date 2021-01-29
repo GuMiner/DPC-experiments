@@ -19,7 +19,7 @@
 
 // ---------- Simulation ----------
 // Overall simulation bounds
-#define AUTO_EXIT 1
+#define AUTO_EXIT 0
 #define MAX_SIMULATION_STEPS 500
 #define SIM_STATS_REPORT_INTERVAL 50
 #define SIM_MAX 10.0f
@@ -47,6 +47,7 @@
 #define FAN_CENTER_Z 5.0f
 #define FAN_SIZE_XY 5.0f
 #define FAN_DENSITY 1.0f
+#define FAN_COLLISION_DISTANCE 0.5f
 
 // Radians / sec
 // 700 RPM by default, a reasonable computer fan speed

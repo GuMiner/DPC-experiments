@@ -139,7 +139,7 @@ void ImguiRenderer::Update(float currentTime, float frameTime, const Camera& _un
     io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
 
     // Setup time step
-    io.DeltaTime = std::max(frameTime, 0.0001f); // Avoids crashes when the frame time is messed up from pauses.
+    io.DeltaTime = std::max(frameTime, 0.000001f); // Avoids crashes when the frame time is messed up from pauses.
 
     // Setup inputs
     // (we already got mouse wheel, keyboard keys & characters from glfw callbacks polled in glfwPollEvents())

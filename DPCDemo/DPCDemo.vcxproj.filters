@@ -29,6 +29,9 @@
     <Filter Include="DPCDemo\DataTypes">
       <UniqueIdentifier>{cf692ab9-0911-4f6b-9973-7953d5e4e652}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DPCDemo\Display\Infra\External">
+      <UniqueIdentifier>{e9bf8f9c-10c4-4fd8-9280-dc37375d7ae1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DPCDemo.cpp">
@@ -53,9 +56,6 @@
       <Filter>DPCDemo\Input</Filter>
     </ClCompile>
     <ClCompile Include="FpsCounter.cpp">
-      <Filter>DPCDemo\Display\Infra</Filter>
-    </ClCompile>
-    <ClCompile Include="ImguiRenderer.cpp">
       <Filter>DPCDemo\Display\Infra</Filter>
     </ClCompile>
     <ClCompile Include="Viewer.cpp">
@@ -87,6 +87,9 @@
     </ClCompile>
     <ClCompile Include="RandData.cpp">
       <Filter>DPCDemo\DataTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="ImguiRenderer.cpp">
+      <Filter>DPCDemo\Display\Infra\External</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -135,9 +138,6 @@
     <ClInclude Include="FpsCounter.h">
       <Filter>DPCDemo\Display\Infra</Filter>
     </ClInclude>
-    <ClInclude Include="ImguiRenderer.h">
-      <Filter>DPCDemo\Display\Infra</Filter>
-    </ClInclude>
     <ClInclude Include="ShaderFactory.h">
       <Filter>DPCDemo\Display\Infra</Filter>
     </ClInclude>
@@ -179,6 +179,9 @@
     </ClInclude>
     <ClInclude Include="ExitingParticle.h">
       <Filter>DPCDemo\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="ImguiRenderer.h">
+      <Filter>DPCDemo\Display\Infra\External</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,6 +8,7 @@
 #include <CL/sycl/INTEL/fpga_extensions.hpp>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/gtx/intersect.hpp>
 #include <glm/gtx/norm.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -103,6 +104,15 @@ glm::mat4 UpdateFanRotation(float angle)
         glm::translate(glm::vec3(-SIM_MAX / 2.0f, -SIM_MAX / 2.0f, 0.0f));
 }
 
+void UpdateMeshVertices(glm::mat4& fanRotationMatrix, std::vector<glm::vec3>& fanVertices, FanMesh* fanMesh)
+{
+    fanVertices.clear();
+    for (long i = 0; i < fanMesh->Vertices.size(); i++)
+    {
+        fanVertices.push_back(glm::vec3(fanRotationMatrix * glm::vec4(fanMesh->Vertices[i], 1.0f)));
+    }
+}
+
 
 void SimulateParticles(FanMesh* fanMesh) {
     queue q = create_device_queue();
@@ -119,6 +129,10 @@ void SimulateParticles(FanMesh* fanMesh) {
 
     float fanZAngle = 0;
     glm::mat4 fanRotationMatrix = UpdateFanRotation(fanZAngle);
+
+    // Pre-compute mesh vertex locations to avoid excessive device computation of the mesh rotation
+    std::vector<glm::vec3> fanVertices;
+    UpdateMeshVertices(fanRotationMatrix, fanVertices, fanMesh);
 
     Random randomGenerator = Random();
     for (long i = 0; i < PARTICLE_COUNT; i++)
@@ -160,9 +174,18 @@ void SimulateParticles(FanMesh* fanMesh) {
             buffer<ExitingParticle, 1> exitingBuffer(exitingParticles.data(), exitingParticles.size(),
                 { cl::sycl::property::buffer::use_host_ptr() });
 
+            buffer<glm::vec3, 1> fanVerticesBuffer(fanVertices.data(), fanVertices.size(),
+                { cl::sycl::property::buffer::use_host_ptr() });
+
+            buffer<glm::vec3, 1> fanBoundsMinBuffer(&fanMesh->min, 1,
+                { cl::sycl::property::buffer::use_host_ptr() });
+
+            buffer<glm::vec3, 1> fanBoundsMaxBuffer(&fanMesh->max, 1,
+                { cl::sycl::property::buffer::use_host_ptr() });
+
             try {
                 // Simulate particle-vs-particle collisions.
-                q.submit([&](handler& handler) {
+                auto particleCollisionTask = q.submit([&](handler& handler) {
                     auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
                     handler.parallel_for(particleRange, [=](nd_item<1> it) {
                         auto i = it.get_global_id();
@@ -172,11 +195,12 @@ void SimulateParticles(FanMesh* fanMesh) {
                             glm::vec3 distance = p[j].position - p[i].position;
 
                             // Only deal with repulsion if the particles are close together.
+                            // This (and other simulation speedups) won't work well on accelerators that work in lockstep and don't deal well with conditional actions.
                             float distanceSqd = glm::length2(distance);
                             if (distanceSqd < SQUARED_REPULSION_DISTANCE)
                             {
                                 float distance_inv = 1.0f / sycl::sqrt(distanceSqd + TOO_CLOSE_SOFTENING_CONST);
-                                
+
                                 // F = ma and Coulomb's law, approximately.
                                 acc += REPULSION_CONST * distance * distance_inv / p[i].mass;
                             }
@@ -184,10 +208,81 @@ void SimulateParticles(FanMesh* fanMesh) {
 
                         p[i].acceleration = acc;
                         });
-                    }).wait_and_throw();
+                    });
 
-                // Kernel 2
-                q.submit([&](handler& handler) {
+                // See if particles bounce off of the fan and update their velocities if they will.
+                auto meshCollisionTask = q.submit([&](handler& handler) {
+                    handler.depends_on(particleCollisionTask);
+                    auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
+                    auto fanVertices = fanVerticesBuffer.get_access<cl::sycl::access::mode::read>(handler);
+                    auto fanMin = fanBoundsMinBuffer.get_access<cl::sycl::access::mode::read>(handler);
+                    auto fanMax = fanBoundsMaxBuffer.get_access<cl::sycl::access::mode::read>(handler);
+
+                    // Debugging cl::sycl::stream os(1024, 128, handler);
+                    handler.parallel_for(particleRange, [=](nd_item<1> it) {
+                        auto i = it.get_global_id();
+
+                        // Only attempt to bounce if the particles are near the fan
+                        if (p[i].position.x > fanMin[0].x - FAN_COLLISION_DISTANCE &&
+                            p[i].position.x < fanMax[0].x + FAN_COLLISION_DISTANCE &&
+                            p[i].position.y > fanMin[0].y - FAN_COLLISION_DISTANCE &&
+                            p[i].position.y < fanMax[0].y + FAN_COLLISION_DISTANCE &&
+                            p[i].position.z > fanMin[0].z - FAN_COLLISION_DISTANCE &&
+                            p[i].position.z < fanMax[0].z + FAN_COLLISION_DISTANCE)
+                        {
+                            float closestIntersectionDistance = -1.0f; // None found
+                            glm::vec3 closestNormal;
+
+                            // Scan all triangles in the mesh to figure out if a collision happened.
+                            for (int j = 0; j < fanVertices.get_count() / 3; j++)
+                            {
+                                glm::vec3 firstPos = fanVertices[j * 3];
+                                glm::vec3 secondPos = fanVertices[j * 3 + 1];
+                                glm::vec3 thirdPos = fanVertices[j * 3 + 2];
+
+                                // Without a bit of wiggle, the particles can phase through the fan
+                                //  because it moves and the particle does too, at the same time.
+                                float wiggle_factor = 1.5f;
+
+                                glm::vec2 unusedCollisionPos;
+                                float intersectionDistance;
+                                if (glm::intersectRayTriangle(p[i].position, glm::normalize(p[i].velocity),
+                                    firstPos, secondPos, thirdPos,
+                                    unusedCollisionPos, intersectionDistance) && 
+                                    intersectionDistance > 0.0f && 
+                                    intersectionDistance < (glm::length(p[i].velocity) * (TIME_STEP * wiggle_factor)))
+                                {
+                                    if (closestIntersectionDistance < 0.0f || intersectionDistance < closestIntersectionDistance)
+                                    {
+                                        closestIntersectionDistance = intersectionDistance;
+
+                                        // Bounces are infrequent, so unlike mesh vertices, we don't re-compute normals all the time.
+                                        closestNormal = glm::normalize(glm::cross(secondPos - firstPos, thirdPos - firstPos));
+                                    }
+                                }
+                            }
+
+                            // Use the closest collision, if any, for a bounce
+                            if (closestIntersectionDistance > 0.0f)
+                            {
+                                glm::vec3 intersectionPoint = p[i].position + glm::normalize(p[i].velocity) * closestIntersectionDistance;
+
+                                // Technically the particle are moving extra quickly to the surface of the mesh
+                                // This may need fixing, TODO improve.
+                                p[i].position = intersectionPoint;
+                                p[i].velocity = glm::length(p[i].velocity) *
+                                    glm::normalize(glm::reflect(p[i].velocity, closestNormal));
+                                // TODO add (or subtract) energy in the bounce to account for the fan pushing air around.
+                            }
+                        }
+
+                    });
+                });
+
+                // Move particles and handle boundary conditions
+                auto moveWithBoundaryConditionsTask = q.submit([&](handler& handler) {
+                    handler.depends_on(meshCollisionTask);
+
                     auto p = particleBuffer.get_access<cl::sycl::access::mode::read_write>(handler);
                     auto r = randomBuffer.get_access<cl::sycl::access::mode::read>(handler);
                     auto e = exitingBuffer.get_access<cl::sycl::access::mode::write>(handler);
@@ -241,7 +336,10 @@ void SimulateParticles(FanMesh* fanMesh) {
                             p[i].velocity = r[i].velocity;
                         }
                     });
-                }).wait_and_throw();
+                });
+                
+                // Wait for all three tasks as per the sequence here!
+                moveWithBoundaryConditionsTask.wait_and_throw();
             }
             catch (sycl::exception const& e) {
                 std::cout << "SYCL DPC++ Exception:" << std::endl
@@ -259,6 +357,7 @@ void SimulateParticles(FanMesh* fanMesh) {
 
         fanZAngle += FAN_ROTATION_SPEED * TIME_STEP;
         fanRotationMatrix = UpdateFanRotation(fanZAngle);
+        UpdateMeshVertices(fanRotationMatrix, fanVertices, fanMesh);
 
         // Extract out particles that exited and updated the average energy flow out.
         for (long i = 0; i < PARTICLE_COUNT; i++)
@@ -286,9 +385,7 @@ void SimulateParticles(FanMesh* fanMesh) {
                 count << ": " << 
                 count * TIME_STEP << " sec (in " <<
                 elapsed_seconds << " sec)." << std::endl;
-        } 
-
-        count++;
+        }
 
 // GUI runs forever for diagnostics.
 #if !ENABLE_GUI || AUTO_EXIT
@@ -296,22 +393,23 @@ void SimulateParticles(FanMesh* fanMesh) {
             shouldStopSimulating = true;
         }
 #endif
+
+        count++;
     }
 
     // These results are going to have the default random flow of generated particles, in addition to any fan contributions.
     // That's fine for me, because I am interested in the comparison of these values with other fans, not the absolute values.
     avgExitPosition = avgExitPosition / (float)(exitedParticles + 1);
     
-    // Validation sanity checks:
+    // Validation sanity checks (without a fan):
     // - The exit position should be 5, 5, 5 on average (without a fan).
-    // - The directional energy flow should be very low (again, without a fan)
-    // - The energy transfer score should be > directionality performance score (always)
-    // - Both scores should be near zero (without a fan).
+    // - Both energy transfer scores should be near 0.
     std::cout << "Average exit position: ("
         << avgExitPosition[0] << ", "
         << avgExitPosition[1] << ", "
         << avgExitPosition[2] << "), with "
-        << exitedParticles << " particles." << std::endl;
+        << exitedParticles << " particles in "
+        << count << " steps." << std::endl;
     std::cout << "Directional Energy Flow: ("
         << exitingEnergyFlow[0] << ", "
         << exitingEnergyFlow[1] << ", "
