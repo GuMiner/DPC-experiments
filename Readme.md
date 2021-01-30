@@ -24,15 +24,15 @@ Either download DPCDemo from (this link TODO) or build it using the steps below
    - `cd vcpkg`
    - `bootstrap-vcpkg.bat`
 3. Install dependent libraries using 'vcpkg' and integrate them into Visual Studio
-   - `vcpkg install glew:x64-windows glfw3:x64-windows glm:x64-windows imgui:x64-windows libigl[imgui]:x64-windows magic-enum:x64-windows stb:x64-windows`
+   - `vcpkg install glew:x64-windows glfw3:x64-windows glm:x64-windows imgui:x64-windows libigl[imgui]:x64-windows magic-enum:x64-windows stb:x64-windows argparse:x64-windows`
    - `vcpkg integrate install`
 4. Download this repository
    - `git clone https://github.com/GuMiner/DPC-experiments.git`
 5. Open in Visual Studio, build, and run!
    - Edit `SimConstants.h` to change any settings as desired.
 
-
-
+### Building in DevCloud 
+TODO write in this section.
 
 ## Inspiration
 This application was inspired by the [The Great Cross Architecture Challenge](https://www.codeproject.com/Competitions/1098/The-Great-Cross-Architecture-Challenge). 

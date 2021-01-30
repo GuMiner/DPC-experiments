@@ -96,6 +96,7 @@
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ShaderFactory.cpp" />
+    <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Synchronizer.cpp" />
     <ClCompile Include="Viewer.cpp" />
   </ItemGroup>
@@ -127,6 +128,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ShaderFactory.h" />
     <ClInclude Include="SimConstants.h" />
+    <ClInclude Include="Simulation.h" />
     <ClInclude Include="Synchronizer.h" />
     <ClInclude Include="VboBase.hpp" />
     <ClInclude Include="Viewer.h" />

@@ -1,17 +1,11 @@
 #pragma once
-// ---------- Simulation (set 1) ----------
-// TODO -- move to be configurable.
-#define GPU 0
-#define CPU 1
-#define FPGA 0
-#define FPGA_EMULATOR 0
-
+// ---------- Diagnostics ----------
 #define VERBOSE_DEVICE_LOGS 0
+#define ENABLE_MODEL_LOADER_DEBUG_VIEWER 0
+#define VERBOSE_RENDERER_LOGS 0
 
 // ---------- Display ----------
 #define ENABLE_GUI 1
-#define ENABLE_MODEL_LOADER_DEBUG_VIEWER 0
-#define VERBOSE_RENDERER_LOGS 0
 
 #define MOUSE_ROTATION_SPEED 0.001f
 #define KEYBOARD_MOVEMENT_SPEED 8.0f

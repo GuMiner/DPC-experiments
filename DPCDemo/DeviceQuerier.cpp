@@ -32,8 +32,7 @@ std::ostream& operator<<(std::ostream& stream, const std::vector<T>& items) {
 		stream << "    " << items[i] << std::endl;
 	}
 
-	if (items.size() == 0)
-	{
+	if (items.size() == 0) {
 		stream << std::endl;
 	}
 
@@ -66,8 +65,7 @@ void DeviceQuerier::OutputAllDeviceInfo() {
 	}
 }
 
-void DeviceQuerier::OutputDeviceInfo(const cl::sycl::device& dev)
-{
+void DeviceQuerier::OutputDeviceInfo(const cl::sycl::device& dev) {
 	cl::sycl::platform plat = dev.get_platform();
 
 	std::cout << "Name: "
@@ -133,8 +131,7 @@ void DeviceQuerier::OutputDeviceInfo(const cl::sycl::device& dev)
 		// Crashes with the SYCL host device.
 		std::cout << "  Max Clock Frequency: "
 			<< dev.get_info<cl::sycl::info::device::max_clock_frequency>() << std::endl;
-	}
-	else {
+	} else {
 		std::cout << "  Max Clock Frequency: UNKNOWN" << std::endl;
 	}
 
@@ -232,5 +229,3 @@ void DeviceQuerier::OutputDeviceInfo(const cl::sycl::device& dev)
 		<< dev.get_info<cl::sycl::info::device::reference_count>() << std::endl;
 #endif
 }
-
-

@@ -23,8 +23,7 @@
 #include "SimConstants.h"
 #include "ModelLoader.h"
 
-void ModelLoader::Load(std::string path, FanMesh* fanMesh)
-{
+void ModelLoader::Load(std::string path, FanMesh* const fanMesh) {
     std::cout << "Loading \"" << path << "\"..." << std::endl;
 
     // <n> rows, 3 columns for all of these.
@@ -51,8 +50,7 @@ void ModelLoader::Load(std::string path, FanMesh* fanMesh)
     float sizeZ = scaleZ * (max[2] - min[2]);
 
     // scaling equation: FAN_SIZE_XY * ((x - min_x) / (max_x - min_x)) + FAN_START_XY
-    for (std::ptrdiff_t i = 0; i < V.rows(); i++)
-    {
+    for (std::ptrdiff_t i = 0; i < V.rows(); i++) {
        V(i, 0) = FAN_SIZE_XY * ((V(i, 0) - min[0]) / (max[0] - min[0])) + (FAN_CENTER_XY - FAN_SIZE_XY / 2.0f);
        V(i, 1) = FAN_SIZE_XY * ((V(i, 1) - min[1]) / (max[1] - min[1])) + (FAN_CENTER_XY - FAN_SIZE_XY / 2.0f);
        V(i, 2) = scaleZ * ((V(i, 2) - min[2]) / (max[2] - min[2])) + (FAN_CENTER_Z - sizeZ / 2.0f);
@@ -78,8 +76,7 @@ void ModelLoader::Load(std::string path, FanMesh* fanMesh)
     // Expand and store vertices
     fanMesh->Vertices.clear();
     fanMesh->Normals.clear();
-    for (std::ptrdiff_t i = 0; i < F.rows(); i++)
-    {
+    for (std::ptrdiff_t i = 0; i < F.rows(); i++) {
         int firstIdx = F(i, 0);
         int secondIdx = F(i, 1);
         int thirdIdx = F(i, 2);

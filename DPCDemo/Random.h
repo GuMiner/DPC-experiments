@@ -1,8 +1,7 @@
 #pragma once
 #include <random>
 
-class Random
-{
+class Random {
 	std::random_device randomDevice;
 	std::mt19937 generator;
 

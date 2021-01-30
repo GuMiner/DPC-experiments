@@ -91,6 +91,9 @@
     <ClCompile Include="ImguiRenderer.cpp">
       <Filter>DPCDemo\Display\Infra\External</Filter>
     </ClCompile>
+    <ClCompile Include="Simulation.cpp">
+      <Filter>DPCDemo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VboBase.hpp">
@@ -182,6 +185,9 @@
     </ClInclude>
     <ClInclude Include="ImguiRenderer.h">
       <Filter>DPCDemo\Display\Infra\External</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation.h">
+      <Filter>DPCDemo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,8 @@
 #pragma once
 #include "FanMesh.h"
 
-class ModelLoader
-{
+class ModelLoader {
 public:
-	void Load(std::string path, FanMesh* fanMesh);
+	void Load(std::string path, FanMesh* const fanMesh);
 };
 

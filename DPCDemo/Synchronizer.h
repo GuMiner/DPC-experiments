@@ -7,8 +7,7 @@
 #include "Particle.h"
 
 #pragma once
-class Synchronizer
-{
+class Synchronizer {
 	// Particles
 	// To GUI
 	std::vector<glm::vec3> particlePositions;

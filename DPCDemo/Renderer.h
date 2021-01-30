@@ -18,9 +18,8 @@
 #include "Synchronizer.h"
 #include "Viewer.h"
 
-class Renderer
-{
-	Synchronizer* sync;
+class Renderer {
+	Synchronizer* const sync;
 
 	ImguiRenderer guiRenderer;
 	OpenGl opengl;
@@ -38,8 +37,8 @@ class Renderer
 	void render(float currentTime, glm::mat4& viewMatrix);
 
 public:
-	Renderer(Synchronizer* sync);
-	bool Init(FanMesh* fanMesh);
+	Renderer(Synchronizer* const sync);
+	bool Init(FanMesh* const fanMesh);
 	void Teardown();
 	
 	void Run();
