@@ -11,7 +11,10 @@ DPCDemo is still a work in progress.
 ![Status Image](./status-v1.PNG "Status Image")
 
 ## Usage
-TODO add to this section once there is a terminal interface.
+1. Build (See "Building" below)
+2. Run "DPCDemo.exe"
+   - Specify "--device <device_type>" to use a different device. 
+   - Specify "--input <input-file>" to specify a different fan to test the performance of.
 
 ## Building
 Either download DPCDemo from (this link TODO) or build it using the steps below

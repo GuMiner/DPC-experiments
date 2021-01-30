@@ -49,11 +49,11 @@ int main(int argc, char* argv[]) {
 
     program.add_argument("-d", "--device")
         .default_value(std::string("default")) // TODO add default to help if not printed out.
-        .help("The device DPC++ code will run on.");
+        .help("The device DPC++ code will run on. Valid options are: cpu/fpga/fpga_emulator/gpu/default (the default)");
 
     program.add_argument("-i", "--input")
         .default_value(std::string("test-fans/plane.stl")) // TODO different default
-        .help("The path to the .STL fan mesh that will be simulated.");
+        .help("The path to the .STL fan mesh that will be simulated. Defaults to \"test-fans/plane.stl\"");
 
     try {
         program.parse_args(argc, argv);

@@ -69,18 +69,23 @@ cl::sycl::queue CreateDeviceQueue(std::string deviceType) {
     // Select device from input 
     std::transform(deviceType.begin(), deviceType.end(), deviceType.begin(), std::toupper);
     if (deviceType.compare("CPU") == 0) {
+        std::cout << "Selecting a CPU device..." << std::endl;
         deviceSelector = new cl::sycl::cpu_selector();
     }
     else if (deviceType.compare("FPGA") == 0) {
+        std::cout << "Selecting a FPGA device..." << std::endl;
         deviceSelector = new cl::sycl::INTEL::fpga_selector();
     }
     else if (deviceType.compare("FPGA_EMULATOR") == 0) {
+        std::cout << "Selecting a FPGA emulation device..." << std::endl;
         deviceSelector = new cl::sycl::INTEL::fpga_emulator_selector();
     }
     else if (deviceType.compare("GPU") == 0) {
+        std::cout << "Selecting a GPU device..." << std::endl;
         deviceSelector = new cl::sycl::gpu_selector();
     }
     else {
+        std::cout << "Selecting the DEFAULT device..." << std::endl;
         deviceSelector = new cl::sycl::default_selector();
     }
 
