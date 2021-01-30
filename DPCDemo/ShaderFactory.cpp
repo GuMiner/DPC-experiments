@@ -2,15 +2,14 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
 #include "ShaderFactory.h"
 
 ShaderFactory::ShaderFactory()
-    : shaderPrograms()
-{
+    : shaderPrograms() {
 }
 
-bool ShaderFactory::LoadStringFromFile(const std::string& filename, std::string& result)
-{
+bool ShaderFactory::LoadStringFromFile(const std::string& filename, std::string& result) {
     std::ifstream file(filename.c_str());
     if (!file)
     {
@@ -25,13 +24,11 @@ bool ShaderFactory::LoadStringFromFile(const std::string& filename, std::string&
     return true;
 }
 
-bool ShaderFactory::ReadShader(const char* rootName, const char* extension, std::string* readShader)
-{
+bool ShaderFactory::ReadShader(const char* rootName, const char* extension, std::string* readShader) {
     std::stringstream filenameStream;
     filenameStream << "shaders/" << rootName << extension;
 
-    if (!LoadStringFromFile(filenameStream.str().c_str(), *readShader))
-    {
+    if (!LoadStringFromFile(filenameStream.str().c_str(), *readShader)) {
         std::cout << "Could not load " << extension << " shader: " << *readShader << "!" << std::endl;
         return false;
     }
@@ -40,15 +37,13 @@ bool ShaderFactory::ReadShader(const char* rootName, const char* extension, std:
 }
 
 // Creates and compiles a new shader of the specified type; returns true on success.
-bool ShaderFactory::CreateShader(GLenum shaderType, const char* shaderSource, GLuint* shaderId)
-{
+bool ShaderFactory::CreateShader(GLenum shaderType, const char* shaderSource, GLuint* shaderId) {
     GLint compileStatus;
     GLuint shader = glCreateShader(shaderType);
     glShaderSource(shader, 1, &shaderSource, NULL);
     glCompileShader(shader);
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
-    if (!compileStatus)
-    {
+    if (!compileStatus) {
         GLint logLength;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
 
@@ -67,20 +62,17 @@ bool ShaderFactory::CreateShader(GLenum shaderType, const char* shaderSource, GL
 }
 
 // Creates a new shader program, regardless of the number of shader stages. Stages are added in order of specification in the vector.
-bool ShaderFactory::CreateProgram(std::vector<GLuint> shaders, GLuint* program)
-{
+bool ShaderFactory::CreateProgram(std::vector<GLuint> shaders, GLuint* program) {
     // Create the program
     GLint compileStatus;
     *program = glCreateProgram();
-    for (unsigned int i = 0; i < shaders.size(); i++)
-    {
+    for (unsigned int i = 0; i < shaders.size(); i++) {
         glAttachShader(*program, shaders[i]);
     }
 
     glLinkProgram(*program);
     glGetProgramiv(*program, GL_LINK_STATUS, &compileStatus);
-    if (!compileStatus)
-    {
+    if (!compileStatus) {
         GLint logLength;
         glGetProgramiv(*program, GL_INFO_LOG_LENGTH, &logLength);
 
@@ -93,8 +85,7 @@ bool ShaderFactory::CreateProgram(std::vector<GLuint> shaders, GLuint* program)
     }
 
     // These are auto-deleted when the program is deleted
-    for (unsigned int i = 0; i < shaders.size(); i++)
-    {
+    for (unsigned int i = 0; i < shaders.size(); i++) {
         glDeleteShader(shaders[i]);
     }
 
@@ -102,17 +93,15 @@ bool ShaderFactory::CreateProgram(std::vector<GLuint> shaders, GLuint* program)
 }
 
 // Creates a basic vertex-fragment shader program and adds it to the list of programs that will be deleted at the end of program operation
-bool ShaderFactory::CreateShaderProgram(const char* rootName, GLuint* programId)
-{
+bool ShaderFactory::CreateShaderProgram(const char* rootName, GLuint* programId) {
     std::string vsShader, fsShader;
-    if (!ReadShader(rootName, ".vs", &vsShader) || !ReadShader(rootName, ".fs", &fsShader))
-    {
+    if (!ReadShader(rootName, ".vs", &vsShader) || !ReadShader(rootName, ".fs", &fsShader)) {
         return false;
     }
 
     GLuint vertexShader, fragmentShader;
-    if (!CreateShader(GL_VERTEX_SHADER, vsShader.c_str(), &vertexShader) || !CreateShader(GL_FRAGMENT_SHADER, fsShader.c_str(), &fragmentShader))
-    {
+    if (!CreateShader(GL_VERTEX_SHADER, vsShader.c_str(), &vertexShader)
+        || !CreateShader(GL_FRAGMENT_SHADER, fsShader.c_str(), &fragmentShader)) {
         return false;
     }
 
@@ -120,8 +109,7 @@ bool ShaderFactory::CreateShaderProgram(const char* rootName, GLuint* programId)
     shaders.push_back(vertexShader);
     shaders.push_back(fragmentShader);
 
-    if (!CreateProgram(shaders, programId))
-    {
+    if (!CreateProgram(shaders, programId)) {
         return false;
     }
 
@@ -130,23 +118,18 @@ bool ShaderFactory::CreateShaderProgram(const char* rootName, GLuint* programId)
 }
 
 // Deletes the specified shader program, removing it from the list of known programs.
-void ShaderFactory::DeleteShaderProgram(GLuint program)
-{
+void ShaderFactory::DeleteShaderProgram(GLuint program) {
     glDeleteProgram(program);
-    for (unsigned int i = 0; i < shaderPrograms.size(); i++)
-    {
-        if (shaderPrograms[i] == program)
-        {
+    for (unsigned int i = 0; i < shaderPrograms.size(); i++) {
+        if (shaderPrograms[i] == program) {
             shaderPrograms.erase(shaderPrograms.begin() + i);
             break;
         }
     }
 }
 
-ShaderFactory::~ShaderFactory()
-{
-    for (unsigned int i = 0; i < shaderPrograms.size(); i++)
-    {
+ShaderFactory::~ShaderFactory() {
+    for (unsigned int i = 0; i < shaderPrograms.size(); i++) {
         glDeleteProgram(shaderPrograms[i]);
     }
 

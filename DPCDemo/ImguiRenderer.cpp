@@ -16,7 +16,7 @@
 
 // Grabbed and refactored from a very old version of the backends list
 // https://github.com/ocornut/imgui/blob/master/backends/imgui_impl_glfw.cpp
-// TODO -- refactor this to something new.
+// FUTURE_TODO -- refactor this to something new.
 
 GLFWwindow* ImguiRenderer::window;
 ImguiRenderer::ImguiRenderer()

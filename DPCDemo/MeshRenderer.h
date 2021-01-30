@@ -8,8 +8,7 @@
 #include "PositionVbo.hpp"
 #include "ShaderFactory.h"
 
-class MeshRenderer : public IRenderable
-{
+class MeshRenderer : public IRenderable {
     GLuint programId;
     GLuint projectionMatrixLocation;
 

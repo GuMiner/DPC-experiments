@@ -4,8 +4,7 @@
 #include "PositionVbo.hpp"
 #include "ShaderFactory.h"
 
-class Axis : public IRenderable
-{
+class Axis : public IRenderable {
     GLuint programId;
     GLuint projectionMatrixLocation;
 

@@ -5,54 +5,44 @@
 
 Viewer::Viewer()
     : fovY(30.0f), aspectRatio(1.77778f), nearPlane(0.10f), farPlane(1000.0f), camera(),
-    ScreenWidth(1280), ScreenHeight(720), MaxFramerate(120)
-{
+    ScreenWidth(1280), ScreenHeight(720), MaxFramerate(120) {
     motionTranslator = new DefaultMotionTranslator();
     UpdateMatrices();
 }
 
-Viewer::~Viewer()
-{
+Viewer::~Viewer() {
     delete motionTranslator;
 }
 
-void Viewer::Update(float currentTime, float lastFrameTime, const Camera& camera)
-{
-    if (motionTranslator->Update(&this->camera, lastFrameTime))
-    {
+void Viewer::Update(float currentTime, float lastFrameTime, const Camera& camera) {
+    if (motionTranslator->Update(&this->camera, lastFrameTime)) {
         UpdateMatrices();
     }
 }
 
-void Viewer::SetScreenSize(int width, int height)
-{
+void Viewer::SetScreenSize(int width, int height) {
     ScreenWidth = width;
     ScreenHeight = height;
 }
 
-float Viewer::GetAspectRatio() const
-{
+float Viewer::GetAspectRatio() const {
     return aspectRatio;
 }
 
-float Viewer::GetFovY() const
-{
+float Viewer::GetFovY() const {
     return fovY;
 }
 
-Camera Viewer::GetCamera() const
-{
+Camera Viewer::GetCamera() const {
     return camera;
 }
 
-void Viewer::UpdateMatrices()
-{
+void Viewer::UpdateMatrices() {
     viewMatrix = glm::lookAtLH(camera.position, camera.target, camera.up);
     perspectiveMatrix = glm::perspectiveLH(glm::radians(fovY), aspectRatio, nearPlane, farPlane);
 }
 
-void Viewer::Render(float currentTime, const glm::mat4& projectionMatrix)
-{
+void Viewer::Render(float currentTime, const glm::mat4& projectionMatrix) {
     ImGui::Begin("Camera");
     ImGui::SetWindowSize(ImVec2(200, 110), ImGuiCond_Once);
     ImGui::SetWindowPos(ImVec2(10, 10), ImGuiCond_Once);

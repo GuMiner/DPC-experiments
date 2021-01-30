@@ -8,8 +8,7 @@ Axis::Axis() :
 }
 
 bool Axis::Init(ShaderFactory& shaderFactory) {
-	if (!shaderFactory.CreateShaderProgram("definedColor", &programId))
-	{
+	if (!shaderFactory.CreateShaderProgram("definedColor", &programId)) {
 		std::cout << "Failed to load the 'definedColor' shader!" << std::endl;
 		return false;
 	}
@@ -20,6 +19,7 @@ bool Axis::Init(ShaderFactory& shaderFactory) {
 	positionVbo.SetupOpenGlBuffers();
 	colorVbo.SetupOpenGlBuffers();
 
+	// This all is rather silly, but straightforwardish to comprehend.
 	// RGB (XYZ) axis
 	positionVbo.vertices.push_back(glm::vec3(0, 0, 0));
 	colorVbo.vertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));

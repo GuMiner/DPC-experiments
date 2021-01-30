@@ -8,12 +8,12 @@
 #pragma clang diagnostic pop
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+
 #include "Viewer.h"
 #include "IGlfwMouseHandler.h"
 #include "IGlfwKeyHandler.h"
 
-class Input
-{
+class Input {
     // The window.
     static GLFWwindow* window;
 

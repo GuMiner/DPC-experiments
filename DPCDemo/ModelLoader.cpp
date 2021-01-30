@@ -2,6 +2,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <igl/readSTL.h>
+#include <igl/centroid.h>
 #pragma clang diagnostic pop
 
 #if ENABLE_MODEL_LOADER_DEBUG_VIEWER
@@ -17,8 +18,6 @@
 
 #include <glm/vec3.hpp>
 #include <glm/gtx/normal.hpp> 
-
-#include <igl/centroid.h>
 
 #include "SimConstants.h"
 #include "ModelLoader.h"

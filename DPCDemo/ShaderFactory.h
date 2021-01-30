@@ -8,8 +8,7 @@
 #pragma clang diagnostic pop
 
 // Handles loading and deleting shaders from a common 'shaders' folder
-class ShaderFactory
-{
+class ShaderFactory {
     bool LoadStringFromFile(const std::string& filename, std::string& result);
 
     bool ReadShader(const char* rootName, const char* extension, std::string* readShader);

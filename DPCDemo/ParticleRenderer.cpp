@@ -7,8 +7,7 @@ ParticleRenderer::ParticleRenderer() :
 }
 
 bool ParticleRenderer::Init(ShaderFactory& shaderFactory) {
-	if (!shaderFactory.CreateShaderProgram("definedColorParticles", &programId))
-	{
+	if (!shaderFactory.CreateShaderProgram("definedColorParticles", &programId)) {
 		std::cout << "Failed to load the 'definedColorParticles' shader!" << std::endl;
 		return false;
 	}
@@ -40,8 +39,7 @@ void ParticleRenderer::Transfer(std::vector<glm::vec3>& particlePositions) {
 	float s = 0.2f;
 	float v = 0.3f;
 
-	for (const glm::vec3& position : particlePositions)
-	{
+	for (const glm::vec3& position : particlePositions) {
 		positionVbo.vertices.push_back(position);
 
 		s = 1;

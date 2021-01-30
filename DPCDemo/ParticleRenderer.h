@@ -7,8 +7,7 @@
 #include "PositionVbo.hpp"
 #include "ShaderFactory.h"
 
-class ParticleRenderer : public IRenderable
-{
+class ParticleRenderer : public IRenderable {
     GLuint programId;
     GLuint projectionMatrixLocation;
 

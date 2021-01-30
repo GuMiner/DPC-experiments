@@ -6,8 +6,7 @@
 #include "IGlfwMouseHandler.h"
 #include "IRenderable.h"
 
-struct ImguiRendererProgram
-{
+struct ImguiRendererProgram {
     GLuint programId;
     GLuint vao;
     GLuint vbo;
@@ -19,17 +18,14 @@ struct ImguiRendererProgram
 };
 
 // Renders IMGUI-type GUI. Modified from imgui_impl_glfw_gl3.h/cpp
-class ImguiRenderer : public IGlfwKeyHandler, public IGlfwMouseHandler, public IRenderable
-{
+class ImguiRenderer : public IGlfwKeyHandler, public IGlfwMouseHandler, public IRenderable {
     static GLFWwindow* window;
 
-    static const char* GetClipboardText(void* userData)
-    {
+    static const char* GetClipboardText(void* userData) {
         return glfwGetClipboardString(window);
     }
 
-    static void SetClipboardText(void* userData, const char* text)
-    {
+    static void SetClipboardText(void* userData, const char* text) {
         glfwSetClipboardString(window, text);
     }
 

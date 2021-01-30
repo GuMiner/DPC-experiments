@@ -9,8 +9,7 @@ MeshRenderer::MeshRenderer() :
 }
 
 bool MeshRenderer::Init(ShaderFactory& shaderFactory, std::vector<glm::vec3>& vertices, std::vector<glm::vec3>& normals) {
-	if (!shaderFactory.CreateShaderProgram("mesh", &programId))
-	{
+	if (!shaderFactory.CreateShaderProgram("mesh", &programId)) {
 		std::cout << "Failed to load the 'mesh' shader!" << std::endl;
 		return false;
 	}
@@ -23,8 +22,7 @@ bool MeshRenderer::Init(ShaderFactory& shaderFactory, std::vector<glm::vec3>& ve
 	normalVbo.SetupOpenGlBuffers();
 
 	int counter = 0;
-	for (const glm::vec3 vertex : vertices)
-	{
+	for (const glm::vec3 vertex : vertices) {
 		positionVbo.vertices.push_back(vertex);
 		normalVbo.vertices.push_back(normals[counter / 3]);
 		++counter;

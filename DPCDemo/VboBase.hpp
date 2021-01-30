@@ -6,11 +6,9 @@
 #include <GLFW/glfw3.h>
 #pragma clang diagnostic pop
 
-
 // Defines a base vertex type for VBOs. 
 template<typename T>
-class VboBase
-{
+class VboBase {
 public:
     std::vector<T> vertices;
 
@@ -21,8 +19,7 @@ private:
 protected:
 
     // Child classes typically call TransferToOpenGl by specifying the item count and usage best for that type.
-    void SendToOpenGl(GLuint itemCount, GLenum usage)
-    {
+    void SendToOpenGl(GLuint itemCount, GLenum usage) {
         glEnableVertexAttribArray(layoutPosition);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
         glVertexAttribPointer(layoutPosition, itemCount, GL_FLOAT, GL_FALSE, 0, nullptr);
@@ -31,8 +28,7 @@ protected:
     }
 
     // Child classes determine the layout position.
-    void InitializeToLocation(GLuint layoutPosition)
-    {
+    void InitializeToLocation(GLuint layoutPosition) {
         glGenBuffers(1, &buffer);
         this->layoutPosition = layoutPosition;
     }
@@ -41,8 +37,7 @@ public:
     virtual void SetupOpenGlBuffers() = 0;
     virtual void TransferToOpenGl() = 0;
 
-    void Deinitialize()
-    {
+    void Deinitialize() {
         glDeleteBuffers(1, &buffer);
     }
 };

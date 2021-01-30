@@ -1,15 +1,15 @@
 #pragma once
+#include <string>
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #pragma clang diagnostic pop
-#include <string>
+
 #include "OpenGlCapabilities.h"
 #include "Viewer.h"
 
-class OpenGl
-{
+class OpenGl {
     std::string windowTitle;
     GLFWwindow* window;
 

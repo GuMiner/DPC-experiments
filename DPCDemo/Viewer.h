@@ -7,8 +7,7 @@
 #include "IRenderable.h"
 
 // Takes in user input and a camera to output a perspective and view matrix.
-class Viewer : public IRenderable
-{
+class Viewer : public IRenderable {
     float fovY;
 
     float aspectRatio;

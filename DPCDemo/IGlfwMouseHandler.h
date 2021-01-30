@@ -6,8 +6,7 @@
 #pragma clang diagnostic pop
 
 // Defines methods deriving classes must implement to handle GLFW mouse callbacks.
-class IGlfwMouseHandler
-{
+class IGlfwMouseHandler {
 public:
     virtual void GlfwMouseButtonCallbacks(GLFWwindow* window, int button, int action, int mods) = 0;
     virtual void GlfwScrollCallback(GLFWwindow* window, double xoffset, double yoffset) = 0;

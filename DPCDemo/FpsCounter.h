@@ -1,8 +1,7 @@
 #pragma once
 #include "IRenderable.h"
 
-class FpsCounter : public IRenderable
-{
+class FpsCounter : public IRenderable {
     float fpsTimeAggregated;
     int fpsFramesCounted;
     float lastFrameRate;

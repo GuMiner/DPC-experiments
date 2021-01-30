@@ -6,26 +6,22 @@
 #include <GLFW/glfw3.h>
 #pragma clang diagnostic pop
 #include <glm\vec3.hpp>
+
 #include "VboBase.hpp"
 
-class ColorVbo : public VboBase<glm::vec3>
-{
+class ColorVbo : public VboBase<glm::vec3> {
     GLenum usageType;
 
 public:
     ColorVbo(GLenum usageType = GL_DYNAMIC_DRAW)
-        : usageType(usageType)
-    {
-
+        : usageType(usageType) {
     }
 
-    virtual void SetupOpenGlBuffers() override
-    {
+    virtual void SetupOpenGlBuffers() override {
         InitializeToLocation(1);
     }
 
-    virtual void TransferToOpenGl() override
-    {
+    virtual void TransferToOpenGl() override {
         SendToOpenGl(3, usageType);
     }
 };
