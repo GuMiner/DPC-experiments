@@ -16,6 +16,10 @@ DPCDemo is still a work in progress.
    - Specify "--device <device_type>" to use a different device. 
    - Specify "--input <input-file>" to specify a different fan to test the performance of.
 
+### Running on DevCloud
+1. Build using the "Building in DevCloud" section below.
+2. `make run` to run locally.
+
 ## Building
 Either download DPCDemo from (this link TODO) or build it using the steps below
 
@@ -35,7 +39,11 @@ Either download DPCDemo from (this link TODO) or build it using the steps below
    - Edit `SimConstants.h` to change any settings as desired.
 
 ### Building in DevCloud 
-TODO write in this section.
+1. `ssh devcloud`
+2. `git clone https://github.com/GuMiner/DPC-experiments`
+3. `cd DPC-experiments/DPCDemo`
+4. `nano SimConstants.h` and set *ENABLE_GUI* to 0
+4. `make all`
 
 ## Inspiration
 This application was inspired by the [The Great Cross Architecture Challenge](https://www.codeproject.com/Competitions/1098/The-Great-Cross-Architecture-Challenge). 
