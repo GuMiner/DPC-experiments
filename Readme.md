@@ -22,22 +22,23 @@ DPCDemo is still a work in progress.
 1. Build using the "Building in DevCloud" section below.
 2. `make run` to run locally.
 
-** Queue run on a CPU **
+**Queue run on a CPU**
 1. `qsub -d . devcloud-run-cpu.sh`
 2. Watch for the STDOUT output file to be created from the run.
 3. `nano devcloud-run-cpu.sh.oABCDEF` to inspect the output!
 
-** Queue run on a GPU **
+**Queue run on a GPU**
 1. `qsub -l nodes=1:gpu:ppn=2 -d . devcloud-run-gpu.sh`
 2. Watch for the STDOUT output file to be created from the run.
 3. `nano devcloud-run-gpu.sh.oABCDEF` to inspect the output!
 
-** Queue run on an FPGA **
+**Queue run on an FPGA**
+(Validating...)
 1. `qsub -l nodes=1:fpga_runtime:ppn=2 -d . devcloud-run-fpga.sh`
 2. Watch for the STDOUT output file to be created from the run.
 3. `nano devcloud-run-fpga.sh.oABCDEF` to inspect the output!
 
-** Sample Output (CPU) **
+**Sample Output (CPU)**
 ```
 ########################################################################
 #      Date:           Tue Feb  2 00:50:33 PST 2021
@@ -81,7 +82,7 @@ Done.
 ########################################################################
 ```
 
-** Sample Output (GPU) **
+**Sample Output (GPU)**
 
 ```
 ########################################################################
@@ -127,7 +128,8 @@ Done.
 ########################################################################
 ```
 
-** 
+**Sample Output (FPGA)**
+Pending FPGA run to validate FPGA steps.
 
 ## Building
 Either download DPCDemo from (this link TODO) or build it using the steps below
@@ -148,16 +150,15 @@ Either download DPCDemo from (this link TODO) or build it using the steps below
    - Edit `SimConstants.h` to change any settings as desired.
 
 ### Building in DevCloud 
-** Setup **
+**Setup**
 1. `ssh devcloud`
 2. `git clone https://github.com/GuMiner/DPC-experiments`
 3. `cd DPC-experiments/DPCDemo`
 4. `nano SimConstants.h` and set *ENABLE_GUI* to 0
 
-** Queue build **
-1. `qsub -l nodes=1:gpu:ppn=2 -d . devcloud-build.sh`
-- This currently doesn't work in DevCloud (it performs `rm -f a.out` and exits).
-- Run `chmod +x ./devcloud-build.sh` followed by `./devcloud-build.sh` locally instead.
+**Queue build**
+1. `qsub -d . devcloud-build.sh`
+- If this is running into problems, locally run `devcloud-build.sh` or `make all`
 2. `watch -n 1 qstat -n -1`
 
 ## Inspiration
