@@ -18,23 +18,18 @@
 #define SIM_STATS_REPORT_INTERVAL 50
 #define SIM_MAX 10.0f
 #define RAND_GENERATOR_SEED 4321
-#define TIME_STEP 0.00001f
+#define TIME_STEP 0.000005f // 5 microseconds. Slow enough for visual inspection.
 
 // Particle simulation details
 #define PARTICLE_COUNT 2048
 
 // https://opentextbc.ca/universityphysicsv2openstax/chapter/pressure-temperature-and-rms-speed/
-#define PARTICLE_INIT_VELOCITY 511.0f // m / s, apx speed of sound
+#define PARTICLE_INIT_VELOCITY 511.0f // m / s, apx speed of 'air'. Good enough for a rough estimate
 
 // Real particles aren't this heavy, but there also are many more of them.
+// FUTURE_TODO -- Figuring out what to do in math needs more thought.
 #define PARTICLE_MASS 1.0f // kg, just to make the math nice.
-
-// http://hyperphysics.phy-astr.gsu.edu/hbase/electric/elefor.html
-// TODO -- Make all of these constants physically accurate.
-// 0.01f
-#define SQUARED_REPULSION_DISTANCE 0.0001f
-#define REPULSION_CONST -100.0f
-#define TOO_CLOSE_SOFTENING_CONST 0.00000001f
+#define PARTICLE_SIZE 0.001f // m
 
 // FAN simulation details
 #define FAN_CENTER_XY 5.0f

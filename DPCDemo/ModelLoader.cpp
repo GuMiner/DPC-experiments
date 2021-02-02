@@ -22,14 +22,18 @@
 #include "SimConstants.h"
 #include "ModelLoader.h"
 
-void ModelLoader::Load(std::string path, FanMesh* const fanMesh) {
+bool ModelLoader::Load(std::string path, FanMesh* const fanMesh) {
     std::cout << "Loading \"" << path << "\"..." << std::endl;
 
     // <n> rows, 3 columns for all of these.
     Eigen::MatrixXd V;
     Eigen::MatrixXd N;
     Eigen::MatrixXi F;
-    igl::readSTL(path, V, F, N);
+    if (!igl::readSTL(path, V, F, N)) {
+        std::cout << " libigl could'nt read the fan mesh. Verify the fan mesh exists at the provided path!" << std::endl;
+        return false;
+    }
+
     std::cout << "  Read in " <<
         V.rows() << " vertices, " <<
         N.rows() << " normals, and " <<
@@ -47,6 +51,12 @@ void ModelLoader::Load(std::string path, FanMesh* const fanMesh) {
     // Compute Z scaling from an average of X and Y, just to be a bit safe in case of X & Y sizing differences.
     float scaleZ = (FAN_SIZE_XY / (max[0] - min[0]) + FAN_SIZE_XY / (max[1] - min[1])) / 2.0f;
     float sizeZ = scaleZ * (max[2] - min[2]);
+    if (sizeZ > SIM_MAX) {
+        std::cout << "  The scaled Z size will be " << sizeZ << ", which is more than the simulation cube ("
+            << SIM_MAX << ")." << std::endl;
+        std::cout << "  Please verify that the input mesh is oriented correctly. Some software programs reverse the Y and Z directions on export!" << std::endl;
+        return false;
+    }
 
     // scaling equation: FAN_SIZE_XY * ((x - min_x) / (max_x - min_x)) + FAN_START_XY
     for (std::ptrdiff_t i = 0; i < V.rows(); i++) {
@@ -99,4 +109,6 @@ void ModelLoader::Load(std::string path, FanMesh* const fanMesh) {
     viewer.data().set_mesh(V, F);
     viewer.launch();
 #endif
+
+    return true;
 }

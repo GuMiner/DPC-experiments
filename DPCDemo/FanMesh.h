@@ -15,5 +15,9 @@ public:
 
 	// Computed directly from volume
 	glm::vec3 centroid;
-	float mass; // TODO units
+	
+	// Rather arbitrary, as the fan motor is assumed strong enough
+	// to not be affected by the pushed air.
+	// FUTURE_TODO -- make this useful for a more complicated simulation.
+	float mass;
 };

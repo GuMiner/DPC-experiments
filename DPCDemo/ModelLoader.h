@@ -3,6 +3,6 @@
 
 class ModelLoader {
 public:
-	void Load(std::string path, FanMesh* const fanMesh);
+	bool Load(std::string path, FanMesh* const fanMesh);
 };
 

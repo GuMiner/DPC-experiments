@@ -37,10 +37,10 @@ void RenderThread() {
 }
 #endif
 
-void LoadFanMesh(std::string path) {
+bool LoadFanMesh(std::string path) {
     fanMesh = std::unique_ptr<FanMesh>(new FanMesh());
     std::unique_ptr<ModelLoader> modelLoader = std::unique_ptr<ModelLoader>(new ModelLoader());
-    modelLoader->Load(path, fanMesh.get());
+    return modelLoader->Load(path, fanMesh.get());
 }
 
 int main(int argc, char* argv[]) {
@@ -48,12 +48,12 @@ int main(int argc, char* argv[]) {
     argparse::ArgumentParser program("DPCDemo");
 
     program.add_argument("-d", "--device")
-        .default_value(std::string("default")) // TODO add default to help if not printed out.
+        .default_value(std::string("default"))
         .help("The device DPC++ code will run on. Valid options are: cpu/fpga/fpga_emulator/gpu/default (the default)");
 
     program.add_argument("-i", "--input")
-        .default_value(std::string("test-fans/plane.stl")) // TODO different default
-        .help("The path to the .STL fan mesh that will be simulated. Defaults to \"test-fans/plane.stl\"");
+        .default_value(std::string("test-fans/1-many-blade-fan.stl"))
+        .help("The path to the .STL fan mesh that will be simulated. Defaults to \"test-fans/1-many-blade-fan.stl\"");
 
     try {
         program.parse_args(argc, argv);
@@ -65,7 +65,11 @@ int main(int argc, char* argv[]) {
     }
 
     // Setup simulation
-    LoadFanMesh(program.get<std::string>("--input"));
+    if (!LoadFanMesh(program.get<std::string>("--input"))) {
+        std::cout << "Failed to load the fan mesh!" << std::endl;
+        return 1;
+    }
+
     std::unique_ptr<Simulation> simulation = std::unique_ptr<Simulation>(
         new Simulation(&shouldStopSimulating, fanMesh.get()));
 
