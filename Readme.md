@@ -33,7 +33,11 @@ DPCDemo is still a work in progress.
 3. `nano devcloud-run-gpu.sh.oABCDEF` to inspect the output!
 
 **Queue run on an FPGA**
-(Validating...)
+
+TODO -- running on an FPGA seems to hang. This needs some local diagnosis (with the FPGA emulator) to see what's going wrong here.
+
+Running on an FPGA likely requires building specifically *for* the FPGA, unlike CPU/GPU building.
+
 1. `qsub -l nodes=1:fpga_runtime:ppn=2 -d . devcloud-run-fpga.sh`
 2. Watch for the STDOUT output file to be created from the run.
 3. `nano devcloud-run-fpga.sh.oABCDEF` to inspect the output!
@@ -129,7 +133,8 @@ Done.
 ```
 
 **Sample Output (FPGA)**
-Pending FPGA run to validate FPGA steps.
+
+In process.
 
 ## Building
 Either download DPCDemo from (this link TODO) or build it using the steps below
