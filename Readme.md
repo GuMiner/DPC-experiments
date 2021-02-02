@@ -49,6 +49,8 @@ Either download DPCDemo from (this link TODO) or build it using the steps below
 
 ** Queue build **
 1. `qsub -l nodes=1:gpu:ppn=2 -d . devcloud-build.sh`
+- This currently doesn't work in DevCloud (it performs `rm -f a.out` and exits).
+- Run `chmod +x ./devcloud-build.sh` followed by `./devcloud-build.sh` locally instead.
 2. `watch -n 1 qstat -n -1`
 
 ** Queue run (CPU) **
