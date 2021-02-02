@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <ctype.h>
 #include <CL/sycl.hpp>
 #include <CL/sycl/INTEL/fpga_extensions.hpp>
 #include <glm/vec3.hpp>
@@ -67,7 +68,7 @@ cl::sycl::queue CreateDeviceQueue(std::string deviceType) {
     cl::sycl::device_selector * deviceSelector = nullptr;
 
     // Select device from input 
-    std::transform(deviceType.begin(), deviceType.end(), deviceType.begin(), std::toupper);
+    std::transform(deviceType.begin(), deviceType.end(), deviceType.begin(), static_cast<int(*)(int)>(std::toupper));
     if (deviceType.compare("CPU") == 0) {
         std::cout << "Selecting a CPU device..." << std::endl;
         deviceSelector = new cl::sycl::cpu_selector();
@@ -406,7 +407,7 @@ void Simulation::Simulate(std::string deviceToSelect) {
         // GUI runs forever for diagnostics, otherwise exit after MAX_SIMULATION_STEPS
 #if !ENABLE_GUI || AUTO_EXIT
         if (count == MAX_SIMULATION_STEPS) {
-            shouldStopSimulating = true;
+            *shouldStopSimulating = true;
         }
 #endif
 

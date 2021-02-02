@@ -2,6 +2,7 @@
 #include <atomic>
 #include <chrono>
 #include <vector>
+#include "glm/mat4x4.hpp"
 
 #include "FanMesh.h"
 #include "ExitingParticle.h"

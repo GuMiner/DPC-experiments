@@ -14,7 +14,7 @@
 // ---------- Simulation ----------
 // Overall simulation bounds
 #define AUTO_EXIT 0
-#define MAX_SIMULATION_STEPS 500
+#define MAX_SIMULATION_STEPS 3000
 #define SIM_STATS_REPORT_INTERVAL 50
 #define SIM_MAX 10.0f
 #define RAND_GENERATOR_SEED 4321

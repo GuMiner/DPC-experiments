@@ -1,4 +1,4 @@
-#include <glm\geometric.hpp>
+#include "glm/geometric.hpp"
 
 #include "SimConstants.h"
 #include "Particle.h"
