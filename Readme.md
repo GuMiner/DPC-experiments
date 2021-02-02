@@ -5,10 +5,12 @@ For more information on DPC++, see https://software.intel.com/content/www/us/en/
 
 # DPCDemo
 ## Purpose
-DPCDemo is a particle simulator to test fan performance.
+DPCDemo is a particle simulator to test fan performance
+
+https://devmesh.intel.com/projects/fan-efficiency-particle-simulation
 
 DPCDemo is still a work in progress.
-![Status Image](./status-v1.PNG "Status Image")
+![Status Image](./status-v2.PNG "Status Image")
 
 ## Usage
 1. Build (See "Building" below)
@@ -39,11 +41,25 @@ Either download DPCDemo from (this link TODO) or build it using the steps below
    - Edit `SimConstants.h` to change any settings as desired.
 
 ### Building in DevCloud 
+** Setup **
 1. `ssh devcloud`
 2. `git clone https://github.com/GuMiner/DPC-experiments`
 3. `cd DPC-experiments/DPCDemo`
 4. `nano SimConstants.h` and set *ENABLE_GUI* to 0
-4. `make all`
+
+** Queue build **
+1. `qsub -l nodes=1:gpu:ppn=2 -d . devcloud-build.sh`
+2. `watch -n 1 qstat -n -1`
+
+** Queue run (CPU) **
+1. `qsub -d . devcloud-run-cpu.sh`
+2. Watch for the STDOUT output file to be created from the run.
+3. `nano devcloud-run.sh.oABCDEF` to inspect the output!
+
+** Queue run (GPU) **
+1. `qsub -l nodes=1:gpu:ppn=2 -d . devcloud-run-gpu.sh`
+2. Watch for the STDOUT output file to be created from the run.
+3. `nano devcloud-run.sh.oABCDEF` to inspect the output!
 
 ## Inspiration
 This application was inspired by the [The Great Cross Architecture Challenge](https://www.codeproject.com/Competitions/1098/The-Great-Cross-Architecture-Challenge). 
