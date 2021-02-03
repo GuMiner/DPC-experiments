@@ -167,7 +167,7 @@ cl::sycl::event SimulateParticleToFanMeshCollisions(cl::sycl::queue& q, cl::sycl
         auto fanMin = fanBoundsMinBuffer.get_access<cl::sycl::access::mode::read>(handler);
         auto fanMax = fanBoundsMaxBuffer.get_access<cl::sycl::access::mode::read>(handler);
 
-        // cl::sycl::stream os(1024, 128, handler); // For debugging
+        //  cl::sycl::stream os(1024, 128, handler); // For debugging
         handler.parallel_for(particleRange, [=](cl::sycl::nd_item<1> it) {
             auto i = it.get_global_id();
 
