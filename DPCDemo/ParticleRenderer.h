@@ -23,7 +23,7 @@ class ParticleRenderer : public IRenderable {
 public:
     ParticleRenderer();
     bool Init(ShaderFactory& shaderFactory);
-    void Transfer(std::vector<glm::vec3>& particlePositions);
+    void Transfer(std::vector<glm::vec3>& particlePositions, std::vector<float>& particleSpeeds);
     void SetViewMatrix(glm::mat4& viewMatrix, float pointScale);
     virtual void Update(float currentTime, float lastFrameTime, const Camera& camera) override;
     virtual void Render(float currentTime, const glm::mat4& projectionMatrix) override;

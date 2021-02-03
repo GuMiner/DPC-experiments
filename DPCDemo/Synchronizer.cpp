@@ -12,18 +12,20 @@ void Synchronizer::UpdateParticlePositions(std::vector<Particle>& particles) {
         hasReadUpdate = false;
 
         particlePositions.clear();
+        particleSpeeds.clear();
         for (const Particle& particle : particles) {
             particlePositions.push_back(particle.position);
+            particleSpeeds.push_back(glm::length(particle.velocity));
         }
 
         shouldReadUpdate = true;
     }
 }
 
-void Synchronizer::ReadUpdatedParticlePositions(std::function<void(std::vector<glm::vec3>&)> updater) {
+void Synchronizer::ReadUpdatedParticlePositions(std::function<void(std::vector<glm::vec3>&, std::vector<float>&)> updater) {
     if (shouldReadUpdate.load()) {
         shouldReadUpdate = false;
-        updater(particlePositions);
+        updater(particlePositions, particleSpeeds);
         hasReadUpdate = true;
     }
 }

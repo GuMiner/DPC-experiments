@@ -74,8 +74,8 @@ void Renderer::update(float currentTime, float frameTime) {
         item->Update(currentTime, frameTime, camera);
     }
 
-    sync->ReadUpdatedParticlePositions([this](std::vector<glm::vec3>& particlePositions) {
-        particleRenderer.Transfer(particlePositions);
+    sync->ReadUpdatedParticlePositions([this](std::vector<glm::vec3>& particlePositions, std::vector<float>& particleSpeeds) {
+        particleRenderer.Transfer(particlePositions, particleSpeeds);
     });
 
     sync->ReadUpdatedFanPosition([this](glm::mat4& fanMeshMatrix) {

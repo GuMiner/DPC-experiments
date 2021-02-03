@@ -1,5 +1,8 @@
+#include <algorithm>
 #include <iostream>
 #include <glm/gtx/color_space.hpp> 
+
+#include "SimConstants.h"
 #include "ParticleRenderer.h"
 
 ParticleRenderer::ParticleRenderer() :
@@ -34,27 +37,30 @@ bool ParticleRenderer::Init(ShaderFactory& shaderFactory) {
 	return true;
 }
 
-void ParticleRenderer::Transfer(std::vector<glm::vec3>& particlePositions) {
+void ParticleRenderer::Transfer(std::vector<glm::vec3>& particlePositions, std::vector<float>& particleSpeeds) {
 	positionVbo.vertices.clear();
 	colorVbo.vertices.clear();
 	float h = 0.7f;
-	float s = 0.2f;
-	float v = 0.3f;
 
+	auto minAndMax  = std::minmax_element(particleSpeeds.begin(), particleSpeeds.end());
+
+	long count = 0;
 	for (const glm::vec3& position : particlePositions) {
 		positionVbo.vertices.push_back(position);
 
-		s = 1;
-		v = 1;
-		colorVbo.vertices.push_back(glm::rgbColor(glm::vec3(360 * h, s, v)));
+		// Color by speed
+		if (!COLOR_PARTICLES_RANDOMLY) {
+			h = (particleSpeeds[count] - minAndMax.first[0]) / (minAndMax.second[0] - minAndMax.first[0]);
+		}
 
-		h += 0.05f;
-		s += 0.05f;
-		v += 0.05f;
-		if (h >= 1.0f) { h = 0.0f; }
-		if (s >= 1.0f) { s = 0.0f; }
-		if (v >= 1.0f) { v = 0.0f; }
-		// colorVbo.vertices.push_back(glm::vec3(0.5f, 1.0f, 0.3f));
+		colorVbo.vertices.push_back(glm::rgbColor(glm::vec3(360 * h, 1.0f, 1.0f)));
+
+		if (COLOR_PARTICLES_RANDOMLY) {
+			h += 0.05f;
+			if (h >= 1.0f) { h = 0.0f; }
+		}
+		
+		++count;
 	}
 
 	glBindVertexArray(vao);

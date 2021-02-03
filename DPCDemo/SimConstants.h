@@ -6,6 +6,7 @@
 
 // ---------- Display ----------
 #define ENABLE_GUI 1
+#define COLOR_PARTICLES_RANDOMLY true // false == by velocity
 
 #define MOUSE_ROTATION_SPEED 0.001f
 #define KEYBOARD_MOVEMENT_SPEED 8.0f

@@ -11,6 +11,7 @@ class Synchronizer {
 	// Particles
 	// To GUI
 	std::vector<glm::vec3> particlePositions;
+	std::vector<float> particleSpeeds;
 	std::atomic<bool> shouldReadUpdate;
 
 	// From GUI
@@ -28,7 +29,7 @@ public:
 	Synchronizer(std::atomic<bool>* shouldStopSimulating);
 
 	void UpdateParticlePositions(std::vector<Particle>& particles);
-	void ReadUpdatedParticlePositions(std::function<void(std::vector<glm::vec3>&)> updater);
+	void ReadUpdatedParticlePositions(std::function<void(std::vector<glm::vec3>&, std::vector<float>&)> updater);
 	void UpdateFanPosition(glm::mat4& meshPosition);
 	void ReadUpdatedFanPosition(std::function<void(glm::mat4&)> updater);
 

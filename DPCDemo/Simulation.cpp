@@ -167,7 +167,7 @@ cl::sycl::event SimulateParticleToFanMeshCollisions(cl::sycl::queue& q, cl::sycl
         auto fanMin = fanBoundsMinBuffer.get_access<cl::sycl::access::mode::read>(handler);
         auto fanMax = fanBoundsMaxBuffer.get_access<cl::sycl::access::mode::read>(handler);
 
-        cl::sycl::stream os(1024, 128, handler); // For debugging
+        // cl::sycl::stream os(1024, 128, handler); // For debugging
         handler.parallel_for(particleRange, [=](cl::sycl::nd_item<1> it) {
             auto i = it.get_global_id();
 
@@ -235,12 +235,9 @@ cl::sycl::event SimulateParticleToFanMeshCollisions(cl::sycl::queue& q, cl::sycl
                     // *Importantly*, the normal must be pointed in the correct direction!
                     //  Otherwise, this will pull the particle into the fan, which is just wrong.
                     glm::vec3 normalSpeed = closestNormal * fanSpeedAtIntersection;
-                    os << normalSpeed.x << " " << normalSpeed.y << " " << normalSpeed.z << sycl::endl;
-                    os << p[i].velocity.x << " " << p[i].velocity.y << " " << p[i].velocity.z << sycl::endl;
-                    os << sycl::endl;
                     
-                    // TODO -- this isn't quite right. I need to re-evaluate this.
-                    // p[i].velocity = p[i].velocity + normalSpeed;
+                    // The mass of the fan is essentially infinite, so that simplifies the math.
+                    p[i].velocity = p[i].velocity - 2.0f * normalSpeed;
                 }
             }
         });
