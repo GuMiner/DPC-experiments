@@ -131,7 +131,7 @@ cl::sycl::event SimulateParticleToParticleCollisions(cl::sycl::queue& q, cl::syc
                 }
 
                 glm::vec3 distance = p[j].position - p[i].position;
-                if (glm::length(distance) < PARTICLE_SIZE * 2) {
+                if (glm::length(distance) < PARTICLE_RADIUS * 2) {
                     // Particles should bounce.
                     // For ease-of-math, this is an elastic collision between spheres -- no electric repulsion.
                     // https://physics.stackexchange.com/questions/79047/determine-resultant-velocity-of-an-elastic-particle-particle-collision-in-3d-spa
@@ -179,7 +179,6 @@ cl::sycl::event SimulateParticleToFanMeshCollisions(cl::sycl::queue& q, cl::sycl
                 p[i].position.z > fanMin[0].z - FAN_COLLISION_DISTANCE &&
                 p[i].position.z < fanMax[0].z + FAN_COLLISION_DISTANCE) {
                 float closestIntersectionDistance = -1.0f; // None found
-                float actualIntersectionDistance = -1.0f; // This can be negative.
                 glm::vec3 closestNormal;
 
                 // Scan all triangles in the mesh to figure out if a collision happened.
@@ -196,16 +195,18 @@ cl::sycl::event SimulateParticleToFanMeshCollisions(cl::sycl::queue& q, cl::sycl
                     if (glm::intersectRayTriangle(p[i].position, glm::normalize(p[i].velocity),
                         firstPos, secondPos, thirdPos,
                         unusedCollisionPos, intersectionDistance) &&
-                        intersectionDistance > -glm::length(p[i].velocity) * TIME_STEP &&
-                        intersectionDistance < glm::length(p[i].velocity) * TIME_STEP) {
-                        float absIntersectionDistance = sycl::abs(intersectionDistance);
-                        if (closestIntersectionDistance < 0.0f || absIntersectionDistance < closestIntersectionDistance) {
-                            closestIntersectionDistance = absIntersectionDistance;
-                            actualIntersectionDistance = intersectionDistance;
+                        intersectionDistance > 0.0f &&
+                        intersectionDistance < glm::length(p[i].velocity) * TIME_STEP + PARTICLE_RADIUS) {
+                        if (closestIntersectionDistance < 0.0f || intersectionDistance < closestIntersectionDistance) {
+                            closestIntersectionDistance = intersectionDistance;
 
                             // Bounces are infrequent, so unlike mesh vertices, we don't re-compute normals all the time,
                             //  normals are only computed when a collision occurs for reflection of the particle.
-                            closestNormal = glm::normalize(glm::cross(secondPos - firstPos, thirdPos - firstPos));
+                            // The mesh front face (as visually seen) will be the triangle where the vertices are clockwise.
+                            
+                            // Therefore, in order to compute the actual normal, not the reverse normal, we need to be careful how we compute the normal.
+                            // https://cmichel.io/understanding-front-faces-winding-order-and-normals
+                            closestNormal = glm::normalize(glm::cross(thirdPos - firstPos, secondPos - firstPos));
                         }
                     }
                 }
@@ -213,9 +214,9 @@ cl::sycl::event SimulateParticleToFanMeshCollisions(cl::sycl::queue& q, cl::sycl
                 // Use the closest collision, if any, for a bounce.
                 if (closestIntersectionDistance > 0.0f) {
 
-                    // This technically warps particles forwards (or backwards to the surface of the mesh).
-                    // Because the warping is both directions, this *should* roughly cancel out.
-                    glm::vec3 intersectionPoint = p[i].position + glm::normalize(p[i].velocity) * actualIntersectionDistance;
+                    // This technically warps particles forwards to the surface of the mesh.
+                    // This is slightly physically inaccurate, but should be good enough for this program's purpose.
+                    glm::vec3 intersectionPoint = p[i].position + glm::normalize(p[i].velocity) * closestIntersectionDistance;
                     p[i].position = intersectionPoint;
 
                     // Reflect the particle using the convenient GLM functions to do that for us.
@@ -230,9 +231,16 @@ cl::sycl::event SimulateParticleToFanMeshCollisions(cl::sycl::queue& q, cl::sycl
                     float fanSpeedAtIntersection = FAN_ROTATION_SPEED * distanceFromCenter;
 
                     // Give (or remove) the colliding particle some momentum (via velocity) based on the collision point.
-                    // Conceptually, the particle should gain (or lose) energy to more closely follow the vane it collided from.
+                    //  Conceptually, the particle should gain (or lose) energy to more closely follow the fan vane it collided from.
+                    // *Importantly*, the normal must be pointed in the correct direction!
+                    //  Otherwise, this will pull the particle into the fan, which is just wrong.
                     glm::vec3 normalSpeed = closestNormal * fanSpeedAtIntersection;
-                    p[i].velocity = p[i].velocity + normalSpeed;
+                    os << normalSpeed.x << " " << normalSpeed.y << " " << normalSpeed.z << sycl::endl;
+                    os << p[i].velocity.x << " " << p[i].velocity.y << " " << p[i].velocity.z << sycl::endl;
+                    os << sycl::endl;
+                    
+                    // TODO -- this isn't quite right. I need to re-evaluate this.
+                    // p[i].velocity = p[i].velocity + normalSpeed;
                 }
             }
         });

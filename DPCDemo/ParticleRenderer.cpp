@@ -12,6 +12,8 @@ bool ParticleRenderer::Init(ShaderFactory& shaderFactory) {
 		return false;
 	}
 	projectionMatrixLocation = glGetUniformLocation(programId, "projectionMatrix");
+	viewMatrixLocation = glGetUniformLocation(programId, "viewMatrix");
+	pointScaleLocation = glGetUniformLocation(programId, "pointScale");
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -60,6 +62,12 @@ void ParticleRenderer::Transfer(std::vector<glm::vec3>& particlePositions) {
 	colorVbo.TransferToOpenGl();
 }
 
+void ParticleRenderer::SetViewMatrix(glm::mat4& viewMatrix, float pointScale)
+{
+	this->viewMatrix = viewMatrix;
+	this->pointScale = pointScale;
+}
+
 void ParticleRenderer::Update(float currentTime, float lastFrameTime, const Camera& camera) {
 	// No updates needed for default Axis
 }
@@ -67,6 +75,8 @@ void ParticleRenderer::Update(float currentTime, float lastFrameTime, const Came
 void ParticleRenderer::Render(float currentTime, const glm::mat4& projectionMatrix) {
 	glUseProgram(programId);
 	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
+	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+	glUniform1f(pointScaleLocation, pointScale);
 
 	glBindVertexArray(vao);
 	glDrawArrays(GL_POINTS, 0, positionVbo.vertices.size());

@@ -1,7 +1,9 @@
 #include <iostream>
 #include <thread>
 #include <imgui.h>
+
 #include "Input.h"
+#include "SimConstants.h"
 #include "Renderer.h"
 
 Renderer::Renderer(Synchronizer* const sync) :
@@ -87,6 +89,11 @@ void Renderer::update(float currentTime, float frameTime) {
 
 void Renderer::render(float currentTime, glm::mat4& viewMatrix) {
     glm::mat4 projectionMatrix = viewer.perspectiveMatrix * viewMatrix;
+    
+    // Compute particle sizes so they appear 3D, accounting for the current particle radius. 
+    float pointScale = PARTICLE_RADIUS * 2.0f * viewer.ScreenHeight /
+        tanf(viewer.GetFovY() * (float)3.14159f / 360.0f);
+    particleRenderer.SetViewMatrix(viewMatrix, pointScale);
 
     // Clear the screen (and depth buffer) before any rendering begins.
     const GLfloat color[] = { 0, 0.2f, 0, 1 };

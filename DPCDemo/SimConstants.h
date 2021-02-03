@@ -29,7 +29,7 @@
 // Real particles aren't this heavy, but there also are many more of them.
 // FUTURE_TODO -- Figuring out what to do in math needs more thought.
 #define PARTICLE_MASS 1.0f // kg, just to make the math nice.
-#define PARTICLE_SIZE 0.001f // m
+#define PARTICLE_RADIUS 0.01f // m
 
 // FAN simulation details
 #define FAN_CENTER_XY 5.0f

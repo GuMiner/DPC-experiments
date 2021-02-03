@@ -47,9 +47,8 @@ bool OpenGl::Load(Viewer* viewer) {
     // Let OpenGL shaders determine point sizes.
     glEnable(GL_PROGRAM_POINT_SIZE);
 
-    // libigl can't guarantee face winding
-    //glEnable(GL_CULL_FACE);
-    //glFrontFace(GL_CW);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
