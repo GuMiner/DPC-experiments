@@ -45,6 +45,7 @@ $
 ```
 
 **Sample DevCloud Output (CPU)**
+
 See the following files:
 - [devcloud-run-cpu.sh.o788403](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788403)
 - [devcloud-run-cpu.sh.o788406](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788406)
@@ -52,6 +53,7 @@ See the following files:
 
 
 **Sample DevCloud Output (GPU)**
+
 See the following files:
 - [devcloud-run-gpu.sh.o788410](devcloud-gpu-cpu-output/devcloud-run-gpu.sh.o788410)
 - [devcloud-run-gpu.sh.o788414](devcloud-gpu-cpu-output/devcloud-run-gpu.sh.o788414)
@@ -93,33 +95,10 @@ This application was inspired by the [The Great Cross Architecture Challenge](ht
 
 ## Results
 For more information on these results and what they mean, see https://devmesh.intel.com/projects/fan-efficiency-particle-simulation
-### Fan 1
-```
-Average exit position: (5.11432, 4.95538, 4.86139), with 2571 particles in 3000 steps.
-Directional Energy Flow: (445944, 1.0109e+06, -984544).
 
-Mesh Mass: 1.67721
-Energy Transfer Performance Score: 8.69596e+06
-Directionality Performance Score: 1.4799e+06
-Done.
-``` 
+Because randomness in this program is seeded, see either the CPU or GPU results in the **devcloud-gpu-cpu-output** folder.
 
-### Fan 2
-```
-Average exit position: (5.12642, 4.95672, 4.89277), with 2605 particles in 3000 steps.
-Directional Energy Flow: (2.16341e+06, 1.02154e+06, -2.96457e+06).
-
-Mesh Mass: 3.1188
-Energy Transfer Performance Score: 1.68226e+07
-Directionality Performance Score: 3.80954e+06
-```
-
-### Fan 3
-```
-Average exit position: (5.17131, 4.91061, 4.90695), with 2616 particles in 3000 steps.
-Directional Energy Flow: (1.27706e+06, 324654, 102937).
-
-Mesh Mass: 3.27381
-Energy Transfer Performance Score: 3.03571e+07
-Directionality Performance Score: 1.32169e+06
-```
+For a direct link to the CPU results, use the links below:
+- [devcloud-run-cpu.sh.o788403](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788403)
+- [devcloud-run-cpu.sh.o788406](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788406)
+- [devcloud-run-cpu.sh.o788411](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788411)
