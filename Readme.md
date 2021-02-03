@@ -34,13 +34,14 @@ DPCDemo is still a work in progress.
 
 **Queue run on an FPGA**
 
-TODO -- running on an FPGA seems to hang. This needs some local diagnosis (with the FPGA emulator) to see what's going wrong here.
-
-Running on an FPGA likely requires building specifically *for* the FPGA, unlike CPU/GPU building.
-
-1. `qsub -l nodes=1:fpga_runtime:ppn=2 -d . devcloud-run-fpga.sh`
-2. Watch for the STDOUT output file to be created from the run.
-3. `nano devcloud-run-fpga.sh.oABCDEF` to inspect the output!
+Unfortunately this application appears to be too large to build for an FPGA:
+```
+$ dpcpp SimConstants.h Simulation.h Simulation.cpp Random.h Random.cpp RandData.h RandData.cpp Particle.h Particle.cpp ModelLoader.h ModelLoader.cpp FanMesh.h ExitingParticle.h DPCDemo.cpp DeviceQuerier.h DeviceQuerier.cpp -Idevcloud-dep/include -std=c++17 -fintelfpga -Xshardware
+Out of memory in module quartus_sh (1023 megabytes used).
+...
+dpcpp: error: fpga compiler command failed with exit code 1 (use -v to see invocation)
+$
+```
 
 **Sample Output (CPU)**
 ```
@@ -87,7 +88,6 @@ Done.
 ```
 
 **Sample Output (GPU)**
-
 ```
 ########################################################################
 #      Date:           Tue 02 Feb 2021 12:54:23 AM PST
@@ -163,8 +163,9 @@ Either download DPCDemo from (this link TODO) or build it using the steps below
 
 **Queue build**
 1. `qsub -d . devcloud-build.sh`
-- If this is running into problems, locally run `devcloud-build.sh` or `make all`
+- If this is running into problems (for instance, if 'a.out' isn't generated), locally run `devcloud-build.sh` or `make all`
 2. `watch -n 1 qstat -n -1`
+- This will show the status of the build job, if running.
 
 ## Inspiration
 This application was inspired by the [The Great Cross Architecture Challenge](https://www.codeproject.com/Competitions/1098/The-Great-Cross-Architecture-Challenge). 

@@ -9,8 +9,5 @@ run-cpu:
 run-gpu:
 	./a.out --device gpu
 
-run-fpga:
-	./a.out --device fpga
-
 clean: 
 	rm -f a.out
