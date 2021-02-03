@@ -10,7 +10,7 @@ DPCDemo is a particle simulator to test fan performance
 https://devmesh.intel.com/projects/fan-efficiency-particle-simulation
 
 DPCDemo is still a work in progress.
-![Status Image](./status-v2.PNG "Status Image")
+![Status Image](./status-v3.PNG "Status Image")
 
 ## Usage
 1. Build (See "Building" below)
