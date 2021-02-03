@@ -46,16 +46,16 @@ $
 
 **Sample DevCloud Output (CPU)**
 See the following files:
-[devcloud-run-cpu.sh.o788403](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788403)
-[devcloud-run-cpu.sh.o788406](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788406)
-[devcloud-run-cpu.sh.o788411](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788411)
+- [devcloud-run-cpu.sh.o788403](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788403)
+- [devcloud-run-cpu.sh.o788406](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788406)
+- [devcloud-run-cpu.sh.o788411](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788411)
 
 
 **Sample DevCloud Output (GPU)**
 See the following files:
-[devcloud-run-gpu.sh.o788410](devcloud-gpu-cpu-output/devcloud-run-gpu.sh.o788410)
-[devcloud-run-gpu.sh.o788414](devcloud-gpu-cpu-output/devcloud-run-gpu.sh.o788414)
-[devcloud-run-gpu.sh.o788419](devcloud-gpu-cpu-output/devcloud-run-gpu.sh.o788419)
+- [devcloud-run-gpu.sh.o788410](devcloud-gpu-cpu-output/devcloud-run-gpu.sh.o788410)
+- [devcloud-run-gpu.sh.o788414](devcloud-gpu-cpu-output/devcloud-run-gpu.sh.o788414)
+- [devcloud-run-gpu.sh.o788419](devcloud-gpu-cpu-output/devcloud-run-gpu.sh.o788419)
 
 ## Building
 Because DPCDemo relies on locally-installed technologies, there's no release -- you'll need to build DPCDemo from source using the instructions below.
