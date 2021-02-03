@@ -133,7 +133,7 @@ Done.
 ```
 
 ## Building
-Either download DPCDemo from (this link TODO) or build it using the steps below
+Because DPCDemo relies on locally-installed technologies, there's no release -- you'll need to build DPCDemo from source using the instructions below.
 
 ### Build Locally (Windows, Visual Studio Community 2019)
 1. Install the Intel oneAPI DPC++/C++ compiler
