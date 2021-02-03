@@ -10,13 +10,14 @@ DPCDemo is a particle simulator to test fan performance
 https://devmesh.intel.com/projects/fan-efficiency-particle-simulation
 
 While work on DPCDemo has concluded, there are many improvements that can be made. For more information, see the DevMesh project post for this project: https://devmesh.intel.com/projects/fan-efficiency-particle-simulation
-![Status Image](./status-v3.PNG "Status Image")
+
+![Status Image](./status-V3.PNG "Status Image")
 
 ## Usage
 1. Build (See "Building" below)
-2. Run "DPCDemo.exe"
-   - Specify "--device <device_type>" to use a different device. 
-   - Specify "--input <input-file>" to specify a different fan to test the performance of.
+2. Run `DPCDemo.exe`
+   - Specify `--device <device_type>` to use a different device. 
+   - Specify `--input <input-file>` to specify a different fan to test the performance of.
 
 ### Running on DevCloud
 1. Build using the "Building in DevCloud" section below.
@@ -167,6 +168,7 @@ Because DPCDemo relies on locally-installed technologies, there's no release -- 
 This application was inspired by the [The Great Cross Architecture Challenge](https://www.codeproject.com/Competitions/1098/The-Great-Cross-Architecture-Challenge).
 
 ## Results
+For more information on these results and what they mean, see https://devmesh.intel.com/projects/fan-efficiency-particle-simulation
 ### Fan 1
 ```
 Average exit position: (5.11432, 4.95538, 4.86139), with 2571 particles in 3000 steps.
