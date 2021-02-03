@@ -1,0 +1,92 @@
+
+########################################################################
+#      Date:           Tue 02 Feb 2021 10:35:35 PM PST
+#    Job ID:           788410.v-qsvr-1.aidevcloud
+#      User:           u59417
+# Resources:           neednodes=1:gpu:ppn=2,nodes=1:gpu:ppn=2,walltime=06:00:00
+########################################################################
+
+Loading "test-fans/1-many-blade-fan.stl"...
+  Read in 3648 vertices, 1216 normals, and 1216 faces.
+  Mesh extents: (-5.24972 - 5.24972, -5.24972 - 5.24972, -0.282 - 0.282)
+  Rescaled mesh extents: (2.5 - 7.5, 2.5 - 7.5, 4.86571 - 5.34192)
+Loaded!
+Selecting a GPU device...
+Name: Intel(R) Level-Zero (Intel(R) Graphics [0x4905])
+  Device Type: gpu
+  Vendor: Intel(R) Corporation (Intel(R) Corporation)
+  Version: 1.0 (1.0)
+  Profile: FULL_PROFILE (FULL_PROFILE)
+  0: 0 sec (in 0.300804 sec).
+  50: 0.00025 sec (in 0.00445995 sec).
+  100: 0.0005 sec (in 0.00403955 sec).
+  150: 0.00075 sec (in 0.00404929 sec).
+  200: 0.001 sec (in 0.00447729 sec).
+  250: 0.00125 sec (in 0.00401096 sec).
+  300: 0.0015 sec (in 0.00405828 sec).
+  350: 0.00175 sec (in 0.00444994 sec).
+  400: 0.002 sec (in 0.00404793 sec).
+  450: 0.00225 sec (in 0.00443884 sec).
+  500: 0.0025 sec (in 0.00404709 sec).
+  550: 0.00275 sec (in 0.00445873 sec).
+  600: 0.003 sec (in 0.00447352 sec).
+  650: 0.00325 sec (in 0.00443898 sec).
+  700: 0.0035 sec (in 0.00405677 sec).
+  750: 0.00375 sec (in 0.0044399 sec).
+  800: 0.004 sec (in 0.00403026 sec).
+  850: 0.00425 sec (in 0.00439813 sec).
+  900: 0.0045 sec (in 0.00450133 sec).
+  950: 0.00475 sec (in 0.00451696 sec).
+  1000: 0.005 sec (in 0.00451065 sec).
+  1050: 0.00525 sec (in 0.00444166 sec).
+  1100: 0.0055 sec (in 0.00447105 sec).
+  1150: 0.00575 sec (in 0.00447416 sec).
+  1200: 0.006 sec (in 0.00448928 sec).
+  1250: 0.00625 sec (in 0.00450778 sec).
+  1300: 0.0065 sec (in 0.00449551 sec).
+  1350: 0.00675 sec (in 0.00459713 sec).
+  1400: 0.007 sec (in 0.00457059 sec).
+  1450: 0.00725 sec (in 0.0041175 sec).
+  1500: 0.0075 sec (in 0.00444971 sec).
+  1550: 0.00775 sec (in 0.00451468 sec).
+  1600: 0.008 sec (in 0.00406996 sec).
+  1650: 0.00825 sec (in 0.00448372 sec).
+  1700: 0.0085 sec (in 0.00401915 sec).
+  1750: 0.00875 sec (in 0.00458458 sec).
+  1800: 0.009 sec (in 0.00448168 sec).
+  1850: 0.00925 sec (in 0.0045076 sec).
+  1900: 0.0095 sec (in 0.00452 sec).
+  1950: 0.00975 sec (in 0.00407251 sec).
+  2000: 0.01 sec (in 0.00439965 sec).
+  2050: 0.01025 sec (in 0.00447704 sec).
+  2100: 0.0105 sec (in 0.004511 sec).
+  2150: 0.01075 sec (in 0.00456571 sec).
+  2200: 0.011 sec (in 0.00450712 sec).
+  2250: 0.01125 sec (in 0.00410528 sec).
+  2300: 0.0115 sec (in 0.00448469 sec).
+  2350: 0.01175 sec (in 0.00446335 sec).
+  2400: 0.012 sec (in 0.00447374 sec).
+  2450: 0.01225 sec (in 0.00440977 sec).
+  2500: 0.0125 sec (in 0.00445615 sec).
+  2550: 0.01275 sec (in 0.00447284 sec).
+  2600: 0.013 sec (in 0.00407327 sec).
+  2650: 0.01325 sec (in 0.00407496 sec).
+  2700: 0.0135 sec (in 0.00439607 sec).
+  2750: 0.01375 sec (in 0.00446048 sec).
+  2800: 0.014 sec (in 0.0040557 sec).
+  2850: 0.01425 sec (in 0.0044622 sec).
+  2900: 0.0145 sec (in 0.00446268 sec).
+  2950: 0.01475 sec (in 0.00444428 sec).
+  3000: 0.015 sec (in 0.00444661 sec).
+Average exit position: (4.87709, 5.03608, 5.02635), with 2625 particles in 3000 steps.
+Directional Energy Flow: (-2.63869e+06, -297162, -1.37872e+06).
+
+Mesh Mass: 1.67721
+Energy Transfer Performance Score: 1.57296e+07
+Directionality Performance Score: 2.99196e+06
+Done.
+
+########################################################################
+# End of output for job 788410.v-qsvr-1.aidevcloud
+# Date: Tue 02 Feb 2021 10:35:53 PM PST
+########################################################################

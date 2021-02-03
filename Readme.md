@@ -44,94 +44,18 @@ dpcpp: error: fpga compiler command failed with exit code 1 (use -v to see invoc
 $
 ```
 
-**Sample Output (CPU)**
-```
-########################################################################
-#      Date:           Tue Feb  2 00:50:33 PST 2021
-#    Job ID:           787613.v-qsvr-1.aidevcloud
-#      User:           u59417
-# Resources:           neednodes=1:batch:ppn=2,nodes=1:batch:ppn=2,walltime=06:00:00
-########################################################################
+**Sample DevCloud Output (CPU)**
+See the following files:
+[devcloud-run-cpu.sh.o788403](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788403)
+[devcloud-run-cpu.sh.o788406](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788406)
+[devcloud-run-cpu.sh.o788411](devcloud-gpu-cpu-output/devcloud-run-cpu.sh.o788411)
 
-Loading "test-fans/1-many-blade-fan.stl"...
-  Read in 3648 vertices, 1216 normals, and 1216 faces.
-  Mesh extents: (-5.24972 - 5.24972, -5.24972 - 5.24972, -0.282 - 0.282)
-  Rescaled mesh extents: (2.5 - 7.5, 2.5 - 7.5, 4.86571 - 5.34192)
-Loaded!
-Selecting the DEFAULT device...
-Name: Intel(R) OpenCL (Intel(R) Xeon(R) Gold 6128 CPU @ 3.40GHz)
-  Device Type: cpu
-  Vendor: Intel(R) Corporation (Intel(R) Corporation)
-  Version: OpenCL 2.1 LINUX (OpenCL 2.1 (Build 0))
-  Profile: FULL_PROFILE (FULL_PROFILE)
-  0: 0 sec (in 1.32081 sec).
-  50: 0.00025 sec (in 0.00417088 sec).
-  100: 0.0005 sec (in 0.00464104 sec).
-  150: 0.00075 sec (in 0.00452471 sec).
-  200: 0.001 sec (in 0.00389265 sec).
-  250: 0.00125 sec (in 0.0057376 sec).
-  300: 0.0015 sec (in 0.00375028 sec).
-  350: 0.00175 sec (in 0.00376327 sec).
-  ...
-  3000: 0.015 sec (in 0.0047184 sec).
-Average exit position: (4.90548, 5.03886, 5.02328), with 2588 particles in 3000 steps.
-Directional Energy Flow: (186780, 200636, 81797.1).
 
-Mesh Mass: 1.67721
-Energy Transfer Performance Score: 362590
-Directionality Performance Score: 286064
-Done.
-
-########################################################################
-# End of output for job 787613.v-qsvr-1.aidevcloud
-# Date: Tue Feb  2 00:50:54 PST 2021
-########################################################################
-```
-
-**Sample Output (GPU)**
-```
-########################################################################
-#      Date:           Tue 02 Feb 2021 12:54:23 AM PST
-#    Job ID:           787614.v-qsvr-1.aidevcloud
-#      User:           u59417
-# Resources:           neednodes=1:gpu:ppn=2,nodes=1:gpu:ppn=2,walltime=06:00:00
-########################################################################
-
-./a.out --device gpu
-Loading "test-fans/1-many-blade-fan.stl"...
-  Read in 3648 vertices, 1216 normals, and 1216 faces.
-  Mesh extents: (-5.24972 - 5.24972, -5.24972 - 5.24972, -0.282 - 0.282)
-  Rescaled mesh extents: (2.5 - 7.5, 2.5 - 7.5, 4.86571 - 5.34192)
-Loaded!
-Selecting a GPU device...
-Name: Intel(R) Level-Zero (Intel(R) Graphics [0x4905])
-  Device Type: gpu
-  Vendor: Intel(R) Corporation (Intel(R) Corporation)
-  Version: 1.0 (1.0)
-  Profile: FULL_PROFILE (FULL_PROFILE)
-  0: 0 sec (in 0.280207 sec).
-  50: 0.00025 sec (in 0.00494955 sec).
-  100: 0.0005 sec (in 0.00500337 sec).
-  150: 0.00075 sec (in 0.00501407 sec).
-  200: 0.001 sec (in 0.0049906 sec).
-  250: 0.00125 sec (in 0.00451487 sec).
-  300: 0.0015 sec (in 0.00457958 sec).
-  350: 0.00175 sec (in 0.00506785 sec).
-  ...
-  3000: 0.015 sec (in 0.00510159 sec).
-Average exit position: (4.90548, 5.03886, 5.02328), with 2588 particles in 3000 steps.
-Directional Energy Flow: (186780, 200636, 81796.8).
-
-Mesh Mass: 1.67721
-Energy Transfer Performance Score: 362590
-Directionality Performance Score: 286063
-Done.
-
-########################################################################
-# End of output for job 787614.v-qsvr-1.aidevcloud
-# Date: Tue 02 Feb 2021 12:54:43 AM PST
-########################################################################
-```
+**Sample DevCloud Output (GPU)**
+See the following files:
+[devcloud-run-gpu.sh.o788410](devcloud-gpu-cpu-output/devcloud-run-gpu.sh.o788410)
+[devcloud-run-gpu.sh.o788414](devcloud-gpu-cpu-output/devcloud-run-gpu.sh.o788414)
+[devcloud-run-gpu.sh.o788419](devcloud-gpu-cpu-output/devcloud-run-gpu.sh.o788419)
 
 ## Building
 Because DPCDemo relies on locally-installed technologies, there's no release -- you'll need to build DPCDemo from source using the instructions below.
